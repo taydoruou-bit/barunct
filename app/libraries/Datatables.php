@@ -1,0 +1,1412 @@
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+/**
+ * Ignited Datatables
+ *
+ * This is a wrapper class/library based on the native Datatables server-side implementation by Allan Jardine
+ * found at http://datatables.net/examples/data_sources/server_side.html for CodeIgniter
+ *
+ * @package    CodeIgniter
+ * @subpackage libraries
+ * @category   library
+ * @version    1.15
+ * @author     Vincent Bambico <metal.conspiracy@gmail.com>
+ *             Yusuf Ozdemir <yusuf@ozdemir.be>
+ * @link       http://ellislab.com/forums/viewthread/160896/
+ */
+class Datatables{
+    /**
+     * Global container variables for chained argument results
+     *
+     */
+    private $ci;
+    private $table;
+    private $distinct;
+    private $group_by = array();
+    private $select = array();
+    private $joins = array();
+    private $columns = array();
+    private $where = array();
+    private $or_where = array();
+    private $like = array();
+    private $filter = array();
+    private $add_columns = array();
+    private $edit_columns = array();
+    private $unset_columns = array();
+
+    /**
+     * Copies an instance of CI
+     */
+    public function __construct()
+    {
+        $this->ci =& get_instance();
+    }
+
+    /**
+     * If you establish multiple databases in config/database.php this will allow you to
+     * set the database (other than $active_group) - more info: http://ellislab.com/forums/viewthread/145901/#712942
+     */
+    public function set_database($db_name)
+    {
+        $db_data = $this->ci->load->database($db_name, TRUE);
+        $this->ci->db = $db_data;
+    }
+
+    /**
+     * Generates the SELECT portion of the query
+     *
+     * @param string $columns
+     * @param bool $backtick_protect
+     * @return mixed
+     */
+    public function select($columns, $backtick_protect = TRUE)
+    {
+        foreach ($this->explode(',', $columns) as $val) {
+            $column = trim(preg_replace('/(.*)\s+as\s+(\w*)/i', '$2', $val));
+            $this->columns[] = $column;
+            $this->select[$column] = trim(preg_replace('/(.*)\s+as\s+(\w*)/i', '$1', $val));
+        }
+
+        $this->ci->db->select($columns, $backtick_protect);
+        return $this;
+    }
+    public function selectupdateColumn($result)
+    {
+        $v=array();
+        foreach ($result->result_array() as $row_key => $row_val) {
+            foreach ($row_val as $key => $val) {                
+                $v[]=$key;              
+            }
+        }
+        $this->columns=array_unique($v);
+        
+    }
+    /**
+     * Generates the DISTINCT portion of the query
+     *
+     * @param string $column
+     * @return mixed
+     */
+    public function distinct($column)
+    {
+        $this->distinct = $column;
+        $this->ci->db->distinct($column);
+        return $this;
+    }
+
+    /**
+     * Generates a custom GROUP BY portion of the query
+     *
+     * @param string $val
+     * @return mixed
+     */
+    public function group_by($val)
+    {
+        $this->group_by[] = $val;
+        $this->ci->db->group_by($val);
+        return $this;
+    }
+
+    /**
+     * Generates the FROM portion of the query
+     *
+     * @param string $table
+     * @return mixed
+     */
+    public function from($table)
+    {
+        $this->table = $table;
+        return $this;
+    }
+
+    /**
+     * Generates the JOIN portion of the query
+     *
+     * @param string $table
+     * @param string $fk
+     * @param string $type
+     * @return mixed
+     */
+    public function join($table, $fk, $type = NULL)
+    {
+        $this->joins[] = array($table, $fk, $type);
+        $this->ci->db->join($table, $fk, $type);
+        return $this;
+    }
+
+    /**
+     * Generates the WHERE portion of the query
+     *
+     * @param mixed $key_condition
+     * @param string $val
+     * @param bool $backtick_protect
+     * @return mixed
+     */
+    public function where($key_condition, $val = NULL, $backtick_protect = TRUE)
+    {
+        $this->where[] = array($key_condition, $val, $backtick_protect);
+        $this->ci->db->where($key_condition, $val, $backtick_protect);
+        return $this;
+    }
+
+    /**
+     * Generates the WHERE portion of the query
+     *
+     * @param mixed $key_condition
+     * @param string $val
+     * @param bool $backtick_protect
+     * @return mixed
+     */
+    public function or_where($key_condition, $val = NULL, $backtick_protect = TRUE)
+    {
+        $this->or_where[] = array($key_condition, $val, $backtick_protect);
+        $this->ci->db->or_where($key_condition, $val, $backtick_protect);
+        return $this;
+    }
+
+    /**
+     * Generates the WHERE portion of the query
+     *
+     * @param mixed $key_condition
+     * @param string $val
+     * @param bool $backtick_protect
+     * @return mixed
+     */
+    public function filter($key_condition, $val = NULL, $backtick_protect = TRUE)
+    {
+        $this->filter[] = array($key_condition, $val, $backtick_protect);
+        return $this;
+    }
+
+    /**
+     * Generates a %LIKE% portion of the query
+     *
+     * @param mixed $key_condition
+     * @param string $val
+     * @param bool $backtick_protect
+     * @return mixed
+     */
+    public function like($key_condition, $val = NULL, $backtick_protect = TRUE)
+    {
+        $this->like[] = array($key_condition, $val, $backtick_protect);
+        $this->ci->db->like($key_condition, $val, $backtick_protect);
+        return $this;
+    }
+
+    /**
+     * Sets additional column variables for adding custom columns
+     *
+     * @param string $column
+     * @param string $content
+     * @param string $match_replacement
+     * @return mixed
+     */
+    public function add_column($column, $content, $match_replacement = NULL)
+    {
+        $this->add_columns[$column] = array('content' => $content, 'replacement' => $this->explode(',', $match_replacement));
+        return $this;
+    }
+
+    /**
+     * Sets additional column variables for editing columns
+     *
+     * @param string $column
+     * @param string $content
+     * @param string $match_replacement
+     * @return mixed
+     */
+    public function edit_column($column, $content, $match_replacement)
+    {
+        $this->edit_columns[$column][] = array('content' => $content, 'replacement' => $this->explode(',', $match_replacement));
+        return $this;
+    }
+
+    /**
+     * Unset column
+     *
+     * @param string $column
+     * @return mixed
+     */
+    public function unset_column($column)
+    {
+        $column = explode(',', $column);
+        $this->unset_columns = array_merge($this->unset_columns, $column);
+        return $this;
+    }
+
+    /**
+     * Builds all the necessary query segments and performs the main query based on results set from chained statements
+     *
+     * @param string $output
+     * @param string $charset
+     * @return string
+     */
+    public function generate($output = 'json', $charset = 'UTF-8',$warehouse_id=NULL,$start_date=null,$end_date=null)
+    {
+        if (strtolower($output) == 'json')
+            $this->get_paging();
+
+        $this->get_ordering();
+        $this->get_filtering();
+        return $this->produce_output(strtolower($output), strtolower($charset),$warehouse_id,$start_date,$end_date);
+    }
+     public function generate_querylhson($output = 'json', $charset = 'UTF-8',$query='')
+    {
+        if (strtolower($output) == 'json')
+            $this->get_paging();
+
+        $this->get_ordering();
+        $this->get_filtering();
+        
+        return $this->produce_output_lhson(strtolower($output), strtolower($charset),$query);
+    }
+
+    /**
+     * Generates the LIMIT portion of the query
+     *
+     * @return mixed
+     */
+    private function get_paging()
+    {
+        $iStart = $this->ci->input->post('iDisplayStart');
+        $iLength = $this->ci->input->post('iDisplayLength');
+
+        if ($iLength != '' && $iLength != '-1')
+            $this->ci->db->limit($iLength, ($iStart) ? $iStart : 0);
+    }
+
+    /**
+     * Generates the ORDER BY portion of the query
+     *
+     * @return mixed
+     */
+    private function get_ordering()
+    {
+        if ($this->check_mDataprop())
+            $mColArray = $this->get_mDataprop();
+        elseif ($this->ci->input->post('sColumns'))
+            $mColArray = explode(',', $this->ci->input->post('sColumns'));
+        else
+            $mColArray = $this->columns;
+
+        $mColArray = array_values(array_diff($mColArray, $this->unset_columns));
+        $columns = array_values(array_diff($this->columns, $this->unset_columns));
+
+        for ($i = 0; $i < intval($this->ci->input->post('iSortingCols')); $i++)
+            if (isset($mColArray[intval($this->ci->input->post('iSortCol_' . $i))]) && in_array($mColArray[intval($this->ci->input->post('iSortCol_' . $i))], $columns) && $this->ci->input->post('bSortable_' . intval($this->ci->input->post('iSortCol_' . $i))) == 'true')
+                $this->ci->db->order_by($mColArray[intval($this->ci->input->post('iSortCol_' . $i))], $this->ci->input->post('sSortDir_' . $i));
+    }
+
+    /**
+     * Generates a %LIKE% portion of the query
+     *
+     * @return mixed
+     */
+    private function get_filtering()
+    {
+        if ($this->check_mDataprop())
+            $mColArray = $this->get_mDataprop();
+        elseif ($this->ci->input->post('sColumns'))
+            $mColArray = explode(',', $this->ci->input->post('sColumns'));
+        else
+            $mColArray = $this->columns;
+
+        $sWhere = '';
+        $sSearch = $this->ci->db->escape_like_str($this->ci->input->post('sSearch'));
+        $mColArray = array_values(array_diff($mColArray, $this->unset_columns));
+        $columns = array_values(array_diff($this->columns, $this->unset_columns));
+
+        if ($sSearch != '')
+            for ($i = 0; $i < count($mColArray); $i++)
+                if ($this->ci->input->post('bSearchable_' . $i) == 'true' && in_array($mColArray[$i], $columns))
+                    $sWhere .= $this->select[$mColArray[$i]] . " LIKE '%" . $sSearch . "%' OR ";
+
+        $sWhere = substr_replace($sWhere, '', -3);
+
+        if ($sWhere != '')
+            $this->ci->db->where('(' . $sWhere . ')');
+
+        $sRangeSeparator = $this->ci->input->post('sRangeSeparator');
+
+        for ($i = 0; $i < intval($this->ci->input->post('iColumns')); $i++) {
+            if (isset($_POST['sSearch_' . $i]) && $this->ci->input->post('sSearch_' . $i) != '' && in_array($mColArray[$i], $columns)) {
+                $miSearch = explode(',', $this->ci->input->post('sSearch_' . $i));
+
+                foreach ($miSearch as $val) {
+                    if (preg_match("/(<=|>=|=|<|>)(\s*)(.+)/i", trim($val), $matches))
+                        $this->ci->db->where($this->select[$mColArray[$i]] . ' ' . $matches[1], $matches[3]);
+                    elseif (!empty($sRangeSeparator) && preg_match("/(.*)$sRangeSeparator(.*)/i", trim($val), $matches)) {
+                        $rangeQuery = '';
+
+                        if (!empty($matches[1]))
+                            $rangeQuery = 'STR_TO_DATE(' . $this->select[$mColArray[$i]] . ",'%d/%m/%y %H:%i:%s') >= STR_TO_DATE('" . $matches[1] . " 00:00:00','%d/%m/%y %H:%i:%s')";
+
+                        if (!empty($matches[2]))
+                            $rangeQuery .= (!empty($rangeQuery) ? ' AND ' : '') . 'STR_TO_DATE(' . $this->select[$mColArray[$i]] . ",'%d/%m/%y %H:%i:%s') <= STR_TO_DATE('" . $matches[2] . " 23:59:59','%d/%m/%y %H:%i:%s')";
+
+                        if (!empty($matches[1]) || !empty($matches[2]))
+                            $this->ci->db->where($rangeQuery);
+                    } else
+                        $this->ci->db->where($this->select[$mColArray[$i]] . ' LIKE', '%' . $val . '%');
+                }
+            }
+        }
+
+        foreach ($this->filter as $val)
+            $this->ci->db->where($val[0], $val[1], $val[2]);
+    }
+
+    /**
+     * Compiles the select statement based on the other functions called and runs the query
+     *
+     * @return mixed
+     */
+    public function get_display_result()
+    {
+        return $this->ci->db->get($this->table);
+    }
+    public function get_display_result_lhson($query,$limit=1,$start=10,$iTotal=10)
+    {       
+        $_limit=$limit;
+        //15 -> 1,2,3
+        //15/10=1
+        //30/10=3, 3 trang; 33/10=3.1==4 trang
+        $boiso=0;
+        if($iTotal>0){
+            $boiso=$iTotal/$start;
+        }
+        
+        $max_page=$tron_boiso=intval($boiso);
+        if($boiso>$tron_boiso){
+            $max_page=$tron_boiso+1;    
+        }
+        if($limit>$max_page&&$max_page>0){
+            $chenhlech=$limit-$max_page;  //3-2=1; ok; 4-2=2ok; 5-2=3;3-2=1; ok; 6-2=4; 4-2;2 ok;7-2=5;5-2;3-2=1;
+            while($chenhlech>$max_page){
+                $chenhlech=$chenhlech-$max_page;  
+            }
+            $limit=$chenhlech;
+        }
+        
+        
+        if($limit==""||$limit==null){
+            $limit=0;
+        }
+        if($start==""||$start==null){
+            $start=10;
+        }
+        if($limit>0){
+            $limit=$limit-1;
+        }
+        if($start>0&&$limit>0){
+            $limit=($limit*$start)+1;
+        }
+        
+        if($start>0){
+            $query.=" LIMIT ".$limit.",".$start;
+        }
+        $qlshon = $this->ci->db->query($query);          
+        return $qlshon;
+    }
+    /**
+     * Builds an encoded string data. Returns JSON by default, and an array of aaData and sColumns if output is set to raw.
+     *
+     * @param string $output
+     * @param string $charset
+     * @return mixed
+     */
+    public function produce_output($output, $charset,$warehouse_id=NULL,$start_date=null,$end_date=null)
+    {
+        $aaData = array();
+        $rResult = $this->get_display_result();
+
+        if ($output == 'json') {
+            $iTotal = $this->get_total_results();
+            $iFilteredTotal = $this->get_total_results(TRUE);
+        }
+            
+        foreach ($rResult->result_array() as $row_key => $row_val) {
+            if(isset($row_val['productid'])&&$row_val['productid']>0){          
+                $this->ci->load->model('site'); 
+                $this->ci->site->syncQuantity(NULL, NULL, NULL, $row_val['productid']);
+                //get ton kho
+                
+                if($warehouse_id){
+                    $row_val['quantity']=$this->ci->site->tonkhohientai($row_val['productid'], $warehouse_id);
+                }else{
+                    $row_val['quantity']=$this->ci->site->getongtonkhoallkho($row_val['productid']);
+                }
+            }
+            
+
+            if(isset($row_val['cost'])&&$row_val['cost']){
+                $donvi_nhap=$this->getdonvitinhnhap($row_val['code']);      
+                $row_val['cost']=$donvi_nhap['name'].":".number_format($row_val['cost']);   
+            }
+            
+            if(isset($row_val['price'])&&$row_val['price']){
+                $donvi_ban=$this->getdonvitinh($row_val['code']);   
+                $_str_price=$row_val['price'];  
+                $donvi_ban2=$this->getdonvitinh_capcha($row_val['code']);    
+                if ($donvi_ban['base_unit']==$donvi_ban2['id']) {
+                     switch($donvi_ban['operator']) {                   
+                        case '*':           
+                            $_str_price=(float)$row_val['price']*(float)$donvi_ban['operation_value'];                            
+                            break;          
+                         case '/':                      
+                            $_str_price=(float)$row_val['price']/(float)$donvi_ban['operation_value'];
+                            break;      
+                         case '+':                      
+                            $_str_price=(float)$row_val['price']+(float)$donvi_ban['operation_value'];
+                            break;
+                        case '-':                   
+                            $_str_price=(float)$row_val['price']-(float)$donvi_ban['operation_value'];
+                            break;  
+                        }
+                }
+                
+                                
+                $row_val['price']=$donvi_ban['name'].":".number_format($_str_price);    
+            }
+            if(isset($row_val['promo_price'])&&$row_val['promo_price']){
+                $donvi_ban=$this->getdonvitinh_capcha($row_val['code']);    
+                $_str_price_km=$row_val['promo_price']; 
+                $donvi_ban2=$this->getdonvitinh_capcha($row_val['code']);    
+                if ($donvi_ban['base_unit']==$donvi_ban2['id']) {
+                     switch($donvi_ban['operator']) {                   
+                        case '*':           
+                            $_str_price_km=(float)$row_val['promo_price']*(float)$donvi_ban['operation_value'];                            
+                            break;          
+                         case '/':                      
+                            $_str_price_km=(float)$row_val['promo_price']/(float)$donvi_ban['operation_value'];
+                            break;      
+                         case '+':                      
+                            $_str_price_km=(float)$row_val['promo_price']+(float)$donvi_ban['operation_value'];
+                            break;
+                        case '-':                   
+                            $_str_price_km=(float)$row_val['promo_price']-(float)$donvi_ban['operation_value'];
+                            break;  
+                        }
+                }           
+                $row_val['promo_price']=$donvi_ban['name'].":".number_format($_str_price_km);   
+            } 
+             if(isset($row_val['giavondt'])&&$row_val['giavondt']==0){
+                //tinh gia von theo tung hoa don/ tung san pham
+                
+                //get id hoa don. get grand_total
+                $loinhuan_hd_all=0;
+                $giavon_hd_all=0;
+                if ($sale_items = $this->ci->site->getAllInvoiceItems($row_val['id'])) {
+                    foreach ($sale_items as $item) {
+                        //lay gia nhap trung binh
+                        $product_id=$item->product_id;
+                        $giavonthuc=$this->ci->site->giavonhangbantheohoadon($product_id,$warehouse_id,$item->unit_quantity,$item->product_unit_id,$item->id);                      
+                         $giavon_hd_all+=$giavonthuc;                                                   
+
+                    }
+                }
+                $row_val['giavondt']=$giavon_hd_all;
+                $row_val['loinhuan']=$row_val['grand_total']-$giavon_hd_all;
+            }
+            $_str_soluong=0;  
+
+            $phan_nguyen=0; 
+            $phan_du=0;
+                     
+            $_str_phandu=0;
+            if(isset($row_val['quantity'])&&$row_val['quantity']){
+                            
+                $donvi=$this->getdonvitinh($row_val['code']);
+                $donvi_cha=$this->getdonvitinh_capcha($row_val['code']);
+                if($row_val['product_code']!=''){
+                    $donvi=$this->getdonvitinh($row_val['product_code']);
+                    $donvi_cha=$this->getdonvitinh_capcha($row_val['product_code']);
+                }   
+
+                if ($donvi['base_unit']==$donvi_cha['id']) {
+                    $_str_phandu=$donvi['operation_value'];
+
+                    switch($donvi['operator']) {                    
+                        case '*':           
+                            $_str_soluong=(float)$row_val['quantity']*(float)$donvi['operation_value'];    
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du/(float)$donvi['operation_value'];  
+                            break;          
+                         case '/':                      
+                            $_str_soluong=(float)$row_val['quantity']/(float)$donvi['operation_value'];
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du*(float)$donvi['operation_value'];  
+                            break;      
+                         case '+':                      
+                            $_str_soluong=(float)$row_val['quantity']+(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du-(float)$donvi['operation_value'];  
+                            break;
+                        case '-':                   
+                            $_str_soluong=(float)$row_val['quantity']-(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du+(float)$donvi['operation_value'];  
+                            break;  
+                        break;  
+                        }
+
+                }    
+                
+
+                if((int)$_str_soluong>0){
+                    if($phan_du!=0){
+                        $row_val['quantity']=$row_val['unit'].": <b>".(float)$phan_nguyen."</b><br/>".$donvi['name'].":".round($_str_phandu,2);     
+                    }else{
+                        $row_val['quantity']=$row_val['unit'].": <b>".(float)$_str_soluong."</b>";
+                    }                   
+                }else{                  
+                    $row_val['quantity']=$row_val['unit'].": <b>".(float)$row_val['quantity']."</b>";                   
+                }
+                
+            } 
+
+            if(isset($row_val['sold'])&&$row_val['sold']){
+                
+                $row_val['quantity']=$this->ci->site->tonkhohientai($row_val['product_id'], $warehouse_id,$start_date,$end_date);
+                
+                if ($row_val['Profit']) {
+                    //tinh loi nhuan theo sl ban dua vao gia tri trung binh nhap
+                    $giavonhangban=$this->ci->site->giavonhangban($row_val['product_id'],$warehouse_id);
+
+                    $sp_ban=$this->ci->site->getTotalSalesSanPham($row_val['product_id'], $warehouse_id,$start_date,$end_date);
+                     if ($sp_ban)
+                     {                           
+                           
+                        $row_val['Profit']=$sp_ban->total_amount-$giavonhangban;                  
+                    }else{
+                         $row_val['Profit']=0;
+                    }
+                        
+                }
+                /*ap dung cho thong ke san pham*/
+                $donvi=$this->getdonvitinh($row_val['code']);
+                $donvi_nhap=$this->getdonvitinhnhap($row_val['code']);
+                $donvi_cha=$this->getdonvitinh_capcha($row_val['code']);
+
+                /*quy doi ton dau*/
+                $_tondau=0;
+                if ($row_val['tondau']) {
+                    //$_tondau=$row_val['tondau'];
+                    $row_val['tondau']=$_tondau=$this->ci->site->getTonDauByDate($row_val['product_id'], $warehouse_id,$start_date,$end_date);
+                   if ((int)$row_val['tondau']>0) {
+                        $_str_soluong=0;
+                        $_str_nhap=0;
+                        $_str_tonkho=0;             
+
+                        $_str_soluong=0;    
+
+                        if ((int)$donvi_cha['base_unit']>0) {
+                            $_str_phandu=0;
+                            switch($donvi_cha['operator']) {                    
+                                case '*':           
+                                    $_str_soluong=(float)$row_val['tondau']/(float)$donvi_cha['operation_value'];    
+                                    $phan_nguyen=(int)$_str_soluong; 
+                                    $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                                    $_str_phandu=$phan_du/(float)$donvi_cha['operation_value'];  
+                                    
+                                    break;          
+                                 case '/':                      
+                                    $_str_soluong=(float)$row_val['tondau']*(float)$donvi_cha['operation_value'];
+                                    $phan_nguyen=(int)$_str_soluong; 
+                                    $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                                    $_str_phandu=$phan_du*(float)$donvi_cha['operation_value'];  
+                                    break;      
+                                 case '+':                      
+                                    $_str_soluong=(float)$row_val['tondau']-(float)$donvi_cha['operation_value'];
+                                     $phan_nguyen=(int)$_str_soluong; 
+                                    $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                                    $_str_phandu=$phan_du-(float)$donvi_cha['operation_value'];  
+                                    break;
+                                case '-':                   
+                                    $_str_soluong=(float)$row_val['tondau']+(float)$donvi_cha['operation_value'];
+                                     $phan_nguyen=(int)$_str_soluong; 
+                                    $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                                    $_str_phandu=$phan_du+(float)$donvi_cha['operation_value'];  
+                                    break;  
+                                break;  
+                                }
+                        }    
+                        if((int)$_str_soluong>0){
+                            
+                            if($phan_du!=0){
+                                $row_val['tondau']=$donvi_cha['name'].": <b>".(float)$phan_nguyen."</b><br/>".$donvi['name'].":".round($_str_phandu,2);     
+                            }else{
+                                $row_val['tondau']=$donvi_cha['name'].": <b>".(float)$_str_soluong."</b>";
+                            }                   
+                        }else{                  
+                            $row_val['tondau']=$donvi_cha['name'].": <b>".(float)$row_val['tondau']."</b>";                   
+                        }
+                    }
+                }
+                $_str_soluong=0;
+                $_str_nhap=0;
+                $_str_tonkho=0;             
+
+                $banra=(float)$this->ci->site->getTongSoluongBanra($row_val['product_id'], $warehouse_id,$start_date,$end_date);
+                
+                $row_val['sold']=(float)$banra;
+                $_str_soluong=0;    
+                $old_banra=$row_val['sold'];
+                // if ($row_val['product_id']==13) {
+                //         echo var_dump($row_val['sold']);
+                //         echo var_dump($donvi);
+                //         echo var_dump($donvi_cha);
+
+                //     }
+                    
+                if ($donvi['base_unit']==$donvi_cha['id']) {
+                    
+                    $_str_phandu=$donvi['operation_value'];
+                    switch($donvi['operator']) {                    
+                        case '*':           
+                            $_str_soluong=(float)$row_val['sold']*(float)$donvi['operation_value'];    
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du/(float)$donvi['operation_value'];  
+                            
+                            break;          
+                         case '/':                      
+                            $_str_soluong=(float)$row_val['sold']/(float)$donvi['operation_value'];
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du*(float)$donvi['operation_value'];  
+                            break;      
+                         case '+':                      
+                            $_str_soluong=(float)$row_val['sold']+(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du-(float)$donvi['operation_value'];  
+                            break;
+                        case '-':                   
+                            $_str_soluong=(float)$row_val['sold']-(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du+(float)$donvi['operation_value'];  
+                            break;  
+                        break;  
+                        }
+                }    
+                $_banraphanguyen=$row_val['sold'];
+                if((int)$_str_soluong>0){
+                    $_banraphanguyen=$_str_soluong;
+                    if($phan_du!=0){
+                        $row_val['sold']=$donvi_cha['name'].": <b>".(float)$phan_nguyen."</b><br/>".$donvi['name'].":<b>".round($_str_phandu,2)."</b>";     
+                    }else{
+                        $row_val['sold']=$donvi_cha['name'].": <b>".(float)$_str_soluong."</b>";
+                    }                   
+                }else{                  
+                    $row_val['sold']=$donvi['name'].": <b>".(float)$row_val['sold']."</b>";                   
+                }
+
+
+                /*nhap hang*/
+                $_str_soluong=0;
+                $_str_nhap=0;
+                $_str_tonkho=0;             
+
+                $danhapvao=(float)$this->ci->site->getTongSoluongNhapVao_QuyDoi($row_val['product_id'], $warehouse_id,$start_date,$end_date);
+                $tondaunguyen=$_tondau;
+                if ($row_val['tondau']&&(int)$_tondau>0) {  
+
+                    if ($row_val['tientondau']) {
+                        $row_val['tientondau']=(float)$this->ci->site->giatrinhapkhobandau($row_val['product_id'],$warehouse_id,$start_date,$end_date);                
+                      }                  
+                    if ($donvi['base_unit']>0) {
+                        switch($donvi['operator']) {                    
+                            case '*':           
+                                $_tondau=(float)$_tondau/(float)$donvi['operation_value'];                                
+                                break;          
+                             case '/':                      
+                                $_tondau=(float)$_tondau*(float)$donvi['operation_value'];
+                                break;      
+                             case '+':                      
+                                $_tondau=(float)$_tondau-(float)$donvi['operation_value'];
+                                break;
+                            case '-':                   
+                                $_tondau=(float)$_tondau+(float)$donvi['operation_value'];
+                                break;  
+                            break;  
+                        }
+                        if ($donvi_cha['base_unit']>0) {
+                            switch($donvi_cha['operator']) {                    
+                                case '*':           
+                                    $_tondau=(float)$_tondau/(float)$donvi_cha['operation_value'];                                
+                                    break;          
+                                 case '/':                      
+                                    $_tondau=(float)$_tondau*(float)$donvi_cha['operation_value'];
+                                    break;      
+                                 case '+':                      
+                                    $_tondau=(float)$_tondau-(float)$donvi_cha['operation_value'];
+                                    break;
+                                case '-':                   
+                                    $_tondau=(float)$_tondau+(float)$donvi_cha['operation_value'];
+                                    break;  
+                                break;  
+                                }
+                        }
+                    } 
+                }
+                $danhapvao=$danhapvao-$_tondau;
+                $row_val['purchased']=(float)$danhapvao;
+                $_str_soluong=0;    
+
+                if ($donvi['base_unit']==$donvi_cha['id']) {
+                    $_str_phandu=$donvi['operation_value'];
+                    switch($donvi['operator']) {                    
+                        case '*':           
+                            $_str_soluong=(float)$row_val['purchased']*(float)$donvi['operation_value'];    
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du/(float)$donvi['operation_value'];  
+                            
+                            break;          
+                         case '/':                      
+                            $_str_soluong=(float)$row_val['purchased']/(float)$donvi['operation_value'];
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du*(float)$donvi['operation_value'];  
+                            break;      
+                         case '+':                      
+                            $_str_soluong=(float)$row_val['purchased']+(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du-(float)$donvi['operation_value'];  
+                            break;
+                        case '-':                   
+                            $_str_soluong=(float)$row_val['purchased']-(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du+(float)$donvi['operation_value'];  
+                            break;  
+                        break;  
+                        }
+                }    
+                $_nhap_lhson=$row_val['purchased'];
+                if((int)$_str_soluong>0){
+                    $_nhap_lhson=$_str_soluong;
+                    if($phan_du!=0){
+                        $row_val['purchased']=$donvi_cha['name'].": <b>".(float)$phan_nguyen."</b><br/>".$donvi['name'].":<b>".round($_str_phandu,2)."</b>";     
+                    }else{
+                        $row_val['purchased']=$donvi_cha['name'].": <b>".(float)$_str_soluong."</b>";
+                    }                   
+                }else{                   
+                    $row_val['purchased']=$donvi['name'].": <b>".(float)$row_val['purchased']."</b>";                   
+                }
+
+
+                if($warehouse_id){
+                    $row_val['balance']=$this->ci->site->tonkhohientai($row_val['product_id'], $warehouse_id,$start_date,$end_date);
+                }else{
+                    //$row_val['balance']=$this->ci->site->getongtonkhoallkho($row_val['product_id']);
+                    $row_val['balance']=$this->ci->site->tonkhohientai($row_val['product_id'], $warehouse_id,$start_date,$end_date);
+                }
+
+                /*end nhap hang */      
+                
+                $_str_soluong=0;    
+                $old_balace=$row_val['balance'];
+                
+                // echo $row_val['product_id']."=>";
+                // echo var_dump($row_val['balacneValue']);
+                // echo "<hr/>";
+                $gianhap_tb=0;
+                $row_val['tienton']=$this->ci->site->giatritonkho($row_val['product_id'],$warehouse_id,$start_date,$end_date);
+                if ($donvi['base_unit']==$donvi_cha['id']) {
+                    $_str_phandu=$donvi['operation_value'];
+                    switch($donvi['operator']) {                    
+                        case '*':           
+                            $_str_soluong=(float)$row_val['balance']*(float)$donvi['operation_value'];    
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du/(float)$donvi['operation_value'];  
+                            
+                            break;          
+                         case '/':                      
+                            $_str_soluong=(float)$row_val['balance']/(float)$donvi['operation_value'];
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du*(float)$donvi['operation_value'];  
+                            break;      
+                         case '+':                      
+                            $_str_soluong=(float)$row_val['balance']+(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du-(float)$donvi['operation_value'];  
+                            break;
+                        case '-':                   
+                            $_str_soluong=(float)$row_val['balance']-(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du+(float)$donvi['operation_value'];  
+                            break;  
+                        break;  
+                        }
+                }    
+                $tonkho_quydoi=$row_val['balance'];
+                if((int)$_str_soluong>0){
+                    $tonkho_quydoi=$_str_soluong;
+                    if ($donvi_cha['base_unit']>0) {
+                        //quy doi tien ton kho ve don vi cha
+                        $_str_tan=$_str_soluong;
+                        switch($donvi_cha['operator']) {                    
+                            case '*':           
+                                $_str_tan=(float)$_str_soluong*(float)$donvi_cha['operation_value'];                                 
+                                break;          
+                             case '/':                      
+                                $_str_tan=(float)$_str_soluong/(float)$donvi_cha['operation_value'];
+                                break;      
+                             case '+':                      
+                                $_str_tan=(float)$_str_soluong+(float)$donvi_cha['operation_value'];
+                                break;
+                            case '-':                   
+                                $_str_tan=(float)$_str_soluong-(float)$donvi_cha['operation_value'];
+                                break;  
+                            break;  
+                        }
+                    }
+                    if($phan_du!=0){
+                        $row_val['balance']=$donvi_cha['name'].": <b style='color:red'>".(float)$phan_nguyen."</b><br/>".$donvi['name'].":<b style='color:red'>".round($_str_phandu,2).'</b>';     
+                    }else{
+                        $row_val['balance']=$donvi_cha['name'].": <b style='color:red'>".(float)$_str_soluong."</b>";
+                    }                   
+                }else{                  
+                    $row_val['balance']=$donvi['name'].": <b style='color:red'>".(float)$row_val['balance']."</b>";                   
+                }
+
+                if (isset($row_val['lhsonchuyenkho'])) { 
+                    //ton dau + nhap - ban - ton kho = chuyen kho
+                    $_chuyenkho=(float)$tondaunguyen+(float)$_nhap_lhson-(float)$_banraphanguyen-(float)$tonkho_quydoi;
+                    //$_chuyenkho=(float)$tondaunguyen;
+                    if($_chuyenkho<1){
+                        $_chuyenkho=0;
+                    }
+                    $row_val['lhsonchuyenkho']=$_chuyenkho;
+                }
+                
+                /*ap dung cho thong ke san pham*/
+
+            }   
+
+    
+         $aaData[$row_key] = ($this->check_mDataprop()) ? $row_val : array_values($row_val);
+
+           foreach ($this->add_columns as $field => $val)
+                if ($this->check_mDataprop())
+                    $aaData[$row_key][$field] = $this->exec_replace($val, $aaData[$row_key]);
+                else
+                    $aaData[$row_key][] = $this->exec_replace($val, $aaData[$row_key]);
+
+            foreach ($this->edit_columns as $modkey => $modval)
+                foreach ($modval as $val)
+                   $aaData[$row_key][($this->check_mDataprop()) ? $modkey : array_search($modkey, $this->columns)] = $this->exec_replace($val, $aaData[$row_key]);
+
+                    $aaData[$row_key] = array_diff_key($aaData[$row_key], ($this->check_mDataprop()) ? $this->unset_columns : array_intersect($this->columns, $this->unset_columns));
+
+            if (!$this->check_mDataprop())
+                $aaData[$row_key] = array_values($aaData[$row_key]);
+        }
+
+        $sColumns = array_diff($this->columns, $this->unset_columns);
+        $sColumns = array_merge_recursive($sColumns, array_keys($this->add_columns));
+
+        if ($output == 'json') {
+            $sOutput = array
+            (
+                'sEcho' => intval($this->ci->input->post('sEcho')),
+                'iTotalRecords' => $iTotal,
+                'iTotalDisplayRecords' => $iFilteredTotal,
+                'aaData' => $aaData,
+                'sColumns' => implode(',', $sColumns)
+            );
+
+            if ($charset == 'utf-8')
+                return json_encode($sOutput);
+            else
+                return $this->jsonify($sOutput);
+        } else
+            return array('aaData' => $aaData, 'sColumns' => $sColumns);
+    }   
+     public function produce_output_lhson($output, $charset,$query)
+    {
+        $iTotal = $this->get_total_results_lhson(FALSE,$query);
+        $limit=intval($this->ci->input->post('sEcho'));
+        $iDisplayLength=intval($this->ci->input->post('iDisplayLength'));       
+        $aaData = array();
+        
+        $rResult = $this->get_display_result_lhson($query,$limit,$iDisplayLength,$iTotal);
+        $this->selectupdateColumn($rResult);
+        if ($output == 'json') {
+            
+            $iFilteredTotal = $this->get_total_results_lhson(TRUE,$query);
+        }
+
+        foreach ($rResult->result_array() as $row_key => $row_val) {
+            $phan_nguyen=0;
+            $phan_du=0;
+            if (isset($row_val['quantity'])) {
+                $phan_nguyen=(int)$row_val['quantity']; 
+                $phan_du=round($row_val['quantity'],4)-$phan_nguyen;
+            }
+            $_str_soluong=0;    
+            
+            $_str_phandu=0;
+            
+            if(isset($row_val['sanphamtheongaycus'])){
+                
+                $tensanpham=$this->getTenSPTheoNgayCusReport($row_val['customer_id'],$row_val['date'],$row_val['warehouse_id']);
+                
+                $row_val['sanphamtheongaycus']=$tensanpham;
+
+            }
+
+            if(isset($row_val['conno_theongay_lhson'])){
+                
+                $dathanhtoan=(float)$this->getPaymentFrom($row_val['customer_id'],$row_val['date']);
+                $dathanhtoan_theohd=$this->getDathanhtoanhd($row_val['customer_id'],$row_val['date']);
+                
+                $damuahang=(float)$dathanhtoan_theohd->grand_total;
+
+                $dathanhtoan+=(float)$dathanhtoan_theohd->total_paid;
+
+                $row_val['conno_theongay_lhson']=$damuahang-$dathanhtoan;
+
+            }
+            $_str_soluong=0;  
+            $phan_nguyen=0; 
+            $phan_du=0;                     
+            $_str_phandu=0;
+            
+            if(isset($row_val['quantity'])&&$row_val['quantity']){
+                            
+                $donvi=$this->getdonvitinh($row_val['code']);
+                $donvi_cha=$this->getdonvitinh_capcha($row_val['code']);
+                if($row_val['product_code']!=''){
+                    $donvi=$this->getdonvitinh($row_val['product_code']);
+                    $donvi_cha=$this->getdonvitinh_capcha($row_val['product_code']);
+                }   
+
+                if ($donvi['base_unit']==$donvi_cha['id']) {
+                    $_str_phandu=$donvi['operation_value'];
+
+                    switch($donvi['operator']) {                    
+                        case '*':           
+                            $_str_soluong=(float)$row_val['quantity']*(float)$donvi['operation_value'];    
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du/(float)$donvi['operation_value'];  
+                            break;          
+                         case '/':                      
+                            $_str_soluong=(float)$row_val['quantity']/(float)$donvi['operation_value'];
+                            $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du*(float)$donvi['operation_value'];  
+                            break;      
+                         case '+':                      
+                            $_str_soluong=(float)$row_val['quantity']+(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du-(float)$donvi['operation_value'];  
+                            break;
+                        case '-':                   
+                            $_str_soluong=(float)$row_val['quantity']-(float)$donvi['operation_value'];
+                             $phan_nguyen=(int)$_str_soluong; 
+                            $phan_du=round($_str_soluong,4)-$phan_nguyen;
+                            $_str_phandu=$phan_du+(float)$donvi['operation_value'];  
+                            break;  
+                        break;  
+                        }
+
+                }    
+                
+
+                if((int)$_str_soluong>0){
+                    if($phan_du!=0){
+                        $row_val['quantity']=$row_val['unit'].": <b>".(float)$phan_nguyen."</b><br/>".$donvi['name'].":".round($_str_phandu,2);     
+                    }else{
+                        $row_val['quantity']=$row_val['unit'].": <b>".(float)$_str_soluong."</b>";
+                    }                   
+                }else{                  
+                    $row_val['quantity']=$row_val['unit'].": <b>".(float)$row_val['quantity']."</b>";                   
+                }
+                
+            }
+            
+         $aaData[$row_key] = ($this->check_mDataprop()) ? $row_val : array_values($row_val);
+
+          /* foreach ($this->add_columns as $field => $val)
+                if ($this->check_mDataprop())
+                    $aaData[$row_key][$field] = $this->exec_replace($val, $aaData[$row_key]);
+                else
+                    $aaData[$row_key][] = $this->exec_replace($val, $aaData[$row_key]);
+
+            foreach ($this->edit_columns as $modkey => $modval)
+                foreach ($modval as $val)
+                   $aaData[$row_key][($this->check_mDataprop()) ? $modkey : array_search($modkey, $this->columns)] = $this->exec_replace($val, $aaData[$row_key]);
+
+                    $aaData[$row_key] = array_diff_key($aaData[$row_key], ($this->check_mDataprop()) ? $this->unset_columns : array_intersect($this->columns, $this->unset_columns));
+            */
+            if (!$this->check_mDataprop()){
+                $aaData[$row_key] = array_values($aaData[$row_key]);
+            }
+        }
+
+        $sColumns = array_diff($this->columns, $this->unset_columns);
+        $sColumns = array_merge_recursive($sColumns, array_keys($this->add_columns));
+        
+        
+        
+        if ($output == 'json') {
+            $sOutput = array
+            (
+                'sEcho' => intval($this->ci->input->post('sEcho')),
+                'iTotalRecords' => $iTotal,
+                'iTotalDisplayRecords' => $iFilteredTotal,
+                'aaData' => $aaData,
+                'sColumns' => implode(',', $sColumns)
+            );
+
+            if ($charset == 'utf-8')
+                return json_encode($sOutput);
+            else
+                return $this->jsonify($sOutput);
+        } else{
+            return array('aaData' => $aaData, 'sColumns' => $sColumns);
+        }
+    }   
+    public function getDathanhtoanhd($customer_id=0,$date='')
+    {
+        
+        $querrylhson="SELECT SUM(COALESCE(grand_total, 0)) as grand_total,SUM(COALESCE(paid, 0)) as total_paid FROM scodeweb_sales WHERE customer_id=".$customer_id." AND sale_status!='returned'";
+        if ($date!='') {
+            $querrylhson.=" AND date(scodeweb_sales.date)<='".$date."'";
+        }
+        
+        $query2=$this->ci->db->query($querrylhson);
+        
+        if ($query2->num_rows() > 0) {
+            return $query2->row();
+        }
+    }
+    public function getPaymentFrom($customer_id=0,$date='')
+    {
+
+        $querrylhson="SELECT SUM(COALESCE(amount, 0)) as total_amount FROM scodeweb_payments WHERE amount>0 AND type='received' AND id_ncc_id_kh=".$customer_id;
+        if ($date!='') {
+            $querrylhson.=" AND date(scodeweb_payments.date)<='".$date."'";
+        }
+        
+        $query2=$this->ci->db->query($querrylhson);
+        
+        if ($query2->num_rows() > 0) {
+            return (float)$query2->row()->total_amount;
+        }
+    }
+    function getdonvitinh($idsp=0){   
+    
+        $query = $this->ci->db->query("select sale_unit from scodeweb_products where code='$idsp'");        
+        $rsdonvi=$query->row_array();       
+        $id_donvi=$rsdonvi['sale_unit'];        
+        if($id_donvi>0){    
+            $query = $this->ci->db->query("select * from scodeweb_units where id='$id_donvi'");     
+            return $query->row_array();     
+        }   
+    }
+    function getdonvitinh_capcha($idsp=0){   
+    
+        $query = $this->ci->db->query("select unit from scodeweb_products where code='$idsp'");        
+        $rsdonvi=$query->row_array();       
+        $id_donvi=$rsdonvi['unit'];        
+        if($id_donvi>0){    
+            $query = $this->ci->db->query("select * from scodeweb_units where id='$id_donvi'");     
+            return $query->row_array();     
+        }   
+    }
+    function getdonvitinhbyid($idsp=0){   
+    
+        $query = $this->ci->db->query("select sale_unit from scodeweb_products where id='$idsp'");        
+        $rsdonvi=$query->row_array();       
+        $id_donvi=$rsdonvi['sale_unit'];        
+        if($id_donvi>0){    
+            $query = $this->ci->db->query("select * from scodeweb_units where id='$id_donvi'");     
+            return $query->row_array();     
+        }   
+    }
+    function getdonvitinhbyidUnit($id=0){   
+         
+        if($id>0){    
+            $query = $this->ci->db->query("select * from scodeweb_units where id='$id'");     
+            return $query->row_array();     
+        }   
+    }
+    function getdonvitinhnhap($idsp=0){   
+    
+        $query = $this->ci->db->query("select purchase_unit from scodeweb_products where code='$idsp'");        
+        $rsdonvi=$query->row_array();       
+        $id_donvi=$rsdonvi['purchase_unit'];        
+        if($id_donvi>0){    
+            $query = $this->ci->db->query("select * from scodeweb_units where id='$id_donvi'");     
+            return $query->row_array();     
+        }   
+    }
+    function getdonvitinhnhapproductId($idsp=0){   
+    
+        $query = $this->ci->db->query("select purchase_unit from scodeweb_products where id='$idsp'");        
+        $rsdonvi=$query->row_array();       
+        $id_donvi=$rsdonvi['purchase_unit'];        
+        if($id_donvi>0){    
+            $query = $this->ci->db->query("select * from scodeweb_units where id='$id_donvi'");     
+            return $query->row_array();     
+        }   
+    }
+    function getTenSPTheoNgayCusReport($customer_id=0,$date='',$warehouse_id=null){
+       $sql="SELECT GROUP_CONCAT(CONCAT(`product_name`,' (',`product_unit_code`,') ',FORMAT(`unit_quantity`,1),'*',FORMAT(`unit_price`,0),'=',FORMAT(`subtotal`,0)) SEPARATOR '<br/>') as sanpham FROM `scodeweb_sale_items` i,scodeweb_sales f where i.sale_id=f.id and f.customer_id=$customer_id and date(f.date)='$date'";
+        $query = $this->ci->db->query($sql);  
+         if ($warehouse_id) {
+                $this->ci->db->where('sales.warehouse_id', $warehouse_id);
+            }     
+        return $query->row_array()['sanpham'];
+    }
+
+    /**
+     * Get result count
+     *
+     * @return integer
+     */
+    private function get_total_results($filtering = FALSE)
+    {
+        if ($filtering)
+            $this->get_filtering();
+
+        foreach ($this->joins as $val)
+            $this->ci->db->join($val[0], $val[1], $val[2]);
+
+        foreach ($this->where as $val)
+            $this->ci->db->where($val[0], $val[1], $val[2]);
+
+        foreach ($this->or_where as $val)
+            $this->ci->db->or_where($val[0], $val[1], $val[2]);
+
+        foreach ($this->group_by as $val)
+            $this->ci->db->group_by($val);
+
+        foreach ($this->like as $val)
+            $this->ci->db->like($val[0], $val[1], $val[2]);
+
+        if (strlen($this->distinct) > 0) {
+            $this->ci->db->distinct($this->distinct);
+            $this->ci->db->select($this->columns);
+        }
+
+        $query = $this->ci->db->get($this->table, NULL, NULL, FALSE);
+        return $query->num_rows();
+    }
+    private function get_total_results_lhson($filtering = FALSE,$query='')
+    {
+        if ($filtering)
+            $this->get_filtering();
+
+        foreach ($this->joins as $val)
+            $this->ci->db->join($val[0], $val[1], $val[2]);
+
+        foreach ($this->where as $val)
+            $this->ci->db->where($val[0], $val[1], $val[2]);
+
+        foreach ($this->or_where as $val)
+            $this->ci->db->or_where($val[0], $val[1], $val[2]);
+
+        foreach ($this->group_by as $val)
+            $this->ci->db->group_by($val);
+
+        foreach ($this->like as $val)
+            $this->ci->db->like($val[0], $val[1], $val[2]);
+
+        if (strlen($this->distinct) > 0) {
+            $this->ci->db->distinct($this->distinct);
+            $this->ci->db->select($this->columns);
+        }
+
+        $query = $this->ci->db->query($query, NULL, NULL, FALSE);
+        return $query->num_rows();
+    }
+
+    /**
+     * Runs callback functions and makes replacements
+     *
+     * @param mixed $custom_val
+     * @param mixed $row_data
+     * @return string $custom_val['content']
+     */
+    private function exec_replace($custom_val, $row_data)
+    {
+        $replace_string = '';
+
+        if (isset($custom_val['replacement']) && is_array($custom_val['replacement'])) {
+            foreach ($custom_val['replacement'] as $key => $val) {
+                $sval = preg_replace("/(?<!\w)([\'\"])(.*)\\1(?!\w)/i", '$2', trim($val));
+
+                if (preg_match('/(\w+::\w+|\w+)\((.*)\)/i', $val, $matches) && is_callable($matches[1])) {
+                    $func = $matches[1];
+                    $args = preg_split("/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|" . "[\s,]*'([^']+)'[\s,]*|" . "[,]+/", $matches[2], 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+                    foreach ($args as $args_key => $args_val) {
+                        $args_val = preg_replace("/(?<!\w)([\'\"])(.*)\\1(?!\w)/i", '$2', trim($args_val));
+                        $args[$args_key] = (in_array($args_val, $this->columns)) ? ($row_data[($this->check_mDataprop()) ? $args_val : array_search($args_val, $this->columns)]) : $args_val;
+                    }
+
+                    $replace_string = call_user_func_array($func, $args);
+                } elseif (in_array($sval, $this->columns))
+                    $replace_string = $row_data[($this->check_mDataprop()) ? $sval : array_search($sval, $this->columns)];
+                else
+                    $replace_string = $sval;
+
+                $custom_val['content'] = str_ireplace('$' . ($key + 1), $replace_string, $custom_val['content']);
+            }
+        }
+
+        return $custom_val['content'];
+    }
+
+    /**
+     * Check mDataprop
+     *
+     * @return bool
+     */
+    private function check_mDataprop()
+    {
+        if (!$this->ci->input->post('mDataProp_0'))
+            return FALSE;
+
+        for ($i = 0; $i < intval($this->ci->input->post('iColumns')); $i++)
+            if (!is_numeric($this->ci->input->post('mDataProp_' . $i)))
+                return TRUE;
+
+        return FALSE;
+    }
+
+    /**
+     * Get mDataprop order
+     *
+     * @return mixed
+     */
+    private function get_mDataprop()
+    {
+        $mDataProp = array();
+
+        for ($i = 0; $i < intval($this->ci->input->post('iColumns')); $i++)
+            $mDataProp[] = $this->ci->input->post('mDataProp_' . $i);
+
+        return $mDataProp;
+    }
+
+    /**
+     * Return the difference of open and close characters
+     *
+     * @param string $str
+     * @param string $open
+     * @param string $close
+     * @return string $retval
+     */
+    private function balanceChars($str, $open, $close)
+    {
+        $openCount = substr_count($str, $open);
+        $closeCount = substr_count($str, $close);
+        $retval = $openCount - $closeCount;
+        return $retval;
+    }
+
+    /**
+     * Explode, but ignore delimiter until closing characters are found
+     *
+     * @param string $delimiter
+     * @param string $str
+     * @param string $open
+     * @param string $close
+     * @return mixed $retval
+     */
+    private function explode($delimiter, $str, $open = '(', $close = ')')
+    {
+        $retval = array();
+        $hold = array();
+        $balance = 0;
+        $parts = explode($delimiter, $str);
+
+        foreach ($parts as $part) {
+            $hold[] = $part;
+            $balance += $this->balanceChars($part, $open, $close);
+
+            if ($balance < 1) {
+                $retval[] = implode($delimiter, $hold);
+                $hold = array();
+                $balance = 0;
+            }
+        }
+
+        if (count($hold) > 0)
+            $retval[] = implode($delimiter, $hold);
+
+        return $retval;
+    }
+
+    /**
+     * Workaround for json_encode's UTF-8 encoding if a different charset needs to be used
+     *
+     * @param mixed $result
+     * @return string
+     */
+    private function jsonify($result = FALSE)
+    {
+        if (is_null($result))
+            return 'null';
+
+        if ($result === FALSE)
+            return 'false';
+
+        if ($result === TRUE)
+            return 'true';
+
+        if (is_scalar($result)) {
+            if (is_float($result))
+                return floatval(str_replace(',', '.', strval($result)));
+
+            if (is_string($result)) {
+                static $jsonReplaces = array(array('\\', '/', '\n', '\t', '\r', '\b', '\f', '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
+                return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $result) . '"';
+            } else
+                return $result;
+        }
+
+        $isList = TRUE;
+
+        for ($i = 0, reset($result); $i < count($result); $i++, next($result)) {
+            if (key($result) !== $i) {
+                $isList = FALSE;
+                break;
+            }
+        }
+
+        $json = array();
+
+        if ($isList) {
+            foreach ($result as $value)
+                $json[] = $this->jsonify($value);
+
+            return '[' . join(',', $json) . ']';
+        } else {
+            foreach ($result as $key => $value)
+                $json[] = $this->jsonify($key) . ':' . $this->jsonify($value);
+
+            return '{' . join(',', $json) . '}';
+        }
+    }
+}
+/* End of file Datatables.php */
+/* Location: ./application/libraries/Datatables.php */

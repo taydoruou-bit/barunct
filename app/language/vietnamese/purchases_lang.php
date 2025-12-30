@@ -1,0 +1,98 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
+/*
+ * Language: English
+ * Module: Purchases
+ *
+ * Last edited:
+ * 30th April 2015
+ *
+ * Package:
+ * Stock Manage Advance v3.0
+ *
+ * You can translate this file to your language.
+ * For instruction on new language setup, please visit the documentations.
+ * You also can share your language files by emailing to saleem@tecdiary.com
+ * Thank you
+ */
+
+
+$lang['add_purchase']                       = "Thêm đơn nhập hàng";
+$lang['edit_purchase']                      = "Sửa nhập hàng";
+$lang['delete_purchase']                    = "Xóa nhập hàng";
+$lang['delete_purchases']                   = "Xóa các đơn nhập";
+$lang['purchase_added']                     = "Thêm đơn nhập hàng thành công";
+$lang['purchase_updated']                   = "Cập nhật đơn nhập hàng thành công";
+$lang['purchase_deleted']                   = "Xóa đơn nhập hàng thành công";
+$lang['purchases_deleted']                  = "Xóa các đơn nhập hàng thành công";
+$lang['ref_no']                             = "Số HĐ";
+$lang['purchase_details']                   = "Thông tin đơn nhập";
+$lang['email_purchase']                     = "Email nhập hàng";
+$lang['purchase_quantity']                  = "Số lượng nhập hàng";
+$lang['please_select_warehouse']            = "Vui lòng chọn kho";
+$lang['purchase_by_csv']                    = "Thêm đơn nhập bằng CSV";
+$lang['received']                           = "Đã nhận";
+$lang['more_options']                       = "Thêm lựa chọn";
+$lang['add_standard_product']               = "Thêm SP tiêu chuẩn";
+$lang['product_code_is_required']           = "Mã sản phẩm là bắt buộc";
+$lang['product_name_is_required']           = "Tên sản phẩm là bắt buộc";
+$lang['product_category_is_required']       = "Danh mục sản phẩm là bắt buộc";
+$lang['product_unit_is_required']           = "Đơn vị sản phẩm là bắt buộc";
+$lang['product_cost_is_required']           = "Giá nhập sản phẩm là bắt buộc";
+$lang['product_price_is_required']          = "Giá sản phẩm là bắt buộc";
+$lang['ordered']                            = "Đang đặt hàng";
+$lang['tax_rate_name']                      = "Tên thuế suất";
+$lang['first_3_are_required_other_optional'] = "<strong>Ba cột đầu tiên là bắt buộc và những phần khác là tùy chọn.</strong>";
+$lang['no_purchase_selected']               = "Không có nhập hàng được chọn. Vui lòng chọn một đơn nhập hàng.";
+$lang['view_payments']                      = "Xem thanh toán";
+$lang['add_payment']                        = "Thêm thanh toán";
+$lang['payment_reference_no']               = "HĐ thanh toán";
+$lang['edit_payment']                       = "Sửa thanh toán";
+$lang['delete_payment']                     = "Xóa thanh toán";
+$lang['delete_payments']                    = "Xóa các thanh toán";
+$lang['payment_added']                      = "Thêm thanh toán thành công";
+$lang['payment_updated']                    = "Cập nhật thanh toán thành công";
+$lang['payment_deleted']                    = "Xóa thanh toán thành công";
+$lang['payments_deleted']                   = "Xóa các thanh toán thành công";
+$lang['paid_by']                            = "Thanh toán bởi";
+$lang['payment_reference']                  = "Số HĐ thanh toán";
+$lang['view_purchase_details']              = "Xem chi tiết nhập hàng";
+$lang['purchase_no']                        = "Mã số đơn nhập hàng";
+$lang['stamp_sign']                         = "Ký tên &	 đóng dấu";
+$lang['balance']                            = "Dư nợ";
+$lang['product_option']                     = "Chọn sản phẩm";
+$lang['payment_sent']                       = "Gửi thanh toán";
+$lang['payment_note']                       = "Ghi chú thanh toán";
+$lang['payment_received']                   = "Thanh toán đã nhận";
+$lang['purchase_status']                    = "Trạng thái nhập hàng";
+$lang['purchase_x_edited_older_than_3_months'] = "Đơn nhập hàng không thể chỉnh sửa khi thời gian lớn hơn 3 tháng. Bạn có thể chỉnh sửa nhập hàng trong vòng 3 tháng.";
+$lang['pr_not_found']                       = "Không có sản phẩm";
+$lang['line_no']                            = "Dòng số";
+$lang['expense']                            = "Chi phí";
+$lang['edit_expense']                       = "Sửa chi phí";
+$lang['delete_expense']                     = "Xóa chi phí";
+$lang['delete_expenses']                    = "Xóa các chi phí";
+$lang['expense_added']                      = "Thêm chi phí thành công";
+$lang['expense_updated']                    = "Cập nhật chi phí thành công";
+$lang['expense_deleted']                    = "Xóa chi phí thành công";
+$lang['reference']                          = "Mã HĐ";
+$lang['expenses_deleted']                   = "Xóa chi phí thành công";
+$lang['expense_note']                       = "Ghi chú chi phí";
+$lang['no_expense_selected']                = "Không có chi phí được chọn. Vui lòng chọn ít nhất một chi phí.";
+$lang['please_select_supplier']             = "Vui lòng chọn nhà cung cấp";
+$lang['unit_cost']                          = "Đơn giá";
+$lang['product_expiry_date_issue']          = "Sản phẩm hết hạn sử dụng";
+$lang['received_more_than_ordered']         = "Số lượng nhận hàng lớn hơn đơn đặt hàng";
+$lang['payment_term']                       = "Phương thức thanh toán";
+$lang['purchase_order']                     = "Hóa đơn nhập hàng";
+$lang['calculate_unit_cost']                = "Tính chi phí nhập hàng";
+$lang['return_purchase']                    = "Hoàn nhập hàng";
+$lang['return_surcharge']                   = "Phụ thu trả hàng";
+$lang['return_quantity']                    = "Số lượng trả";
+$lang['return_note']                        = "Ghi chú trả hàng";
+$lang['return_tip']                         = "Vui lòng chỉnh sửa số lượng hoàn trả dưới đây. Bạn có thể loại bỏ các mục hoặc thiết lập số lượng trở về số không nếu nó không được trả lại";
+$lang['return_amount']                      = "Tiền trả hàng";
+$lang['paid_amount']                        = "đã thanh toán";
+$lang['adjust_payments']                    = "Vui lòng điều chỉnh thanh toán cho việc nhập hàng bằng tay";
+$lang['purchase_status_x_received']         = "Đơn hàng này chưa nhận được hàng";
+$lang['purchase_already_paid']         		= "Hóa đơn đã được thanh toán";

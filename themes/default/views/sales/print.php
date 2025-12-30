@@ -1,0 +1,66 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+
+<div class="modal-dialog">	
+	<?php $attrib = array();
+        echo form_open("sales/printsalelhson/" . $id, $attrib); ?>
+    <div class="modal-content">
+        <div class="modal-header no-print header_lhson_print">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-2x">&times;</i>
+            </button>
+			 <button type="button" name="printsalelhson" onclick="batdauin()" class="btn btn-primary"><i class="fa fa-print"></i> In hóa đơn</button>
+            <h4 class="modal-title" id="myModalLabel"><?php echo $giaohang?"In Giao Hàng":lang('print_sale'); ?></h4>
+        </div>
+        <div class="modal-body" style="padding:0px">
+            <div id="print_value" class="print_value" style="margin:0px auto;padding:0px;width:calc(<?php echo $kich_thuoc;?>)">
+                <?php echo $note['noidung']; ?> 
+            </div>
+        </div> 
+    </div>
+    <?php echo form_close(); ?>
+</div>
+<?= $modal_js ?>
+<style>
+.print_value p{margin:0px;padding:0px;overflow-x: visible;}
+@page {
+  margin: 0;
+}
+	img{
+	max-width:100%;
+		height:auto;
+	}	
+@media print {
+	p{margin:0px;padding:0px;}
+	html, body { overflow-x: visible;height:100%;overflow:visible; font-size:13px }
+    .print_value p{height:100%;overflow:visible;}
+}
+</style>
+<script type="text/javascript">
+    function batdauin(){
+        var size='<?php echo $kich_thuoc;?>';
+        var data=document.getElementById("print_value").innerHTML;      
+        var mywindow = window.open('', 'new div','width=650,height=650,top=50,left=50,toolbars=no,scrollbars=yes,status=no,resizable=yes');
+        
+        mywindow.document.write('<html><head><title>Hóa đơn bán hàng</title><style>body{margin-block-start:0px;margin-block-end:0px;margin:0px;padding:0px;}img{width:100%}</style>');
+                
+        mywindow.document.write('</head><body style="width:<?php echo $kich_thuoc;?>;margin:0px;padding:0px;">');
+        mywindow.document.write(data);          
+        mywindow.document.write('</body></html>');
+        mywindow.focus();           
+        setTimeout(() => { mywindow.print();mywindow.close(); }, 1000);
+        
+    }
+      $(document).ready(function () {
+            var size='<?php echo $kich_thuoc;?>';
+            var data=document.getElementById("print_value").innerHTML;      
+            var mywindow = window.open('', 'new div','width=650,height=650,top=50,left=50,toolbars=no,scrollbars=yes,status=no,resizable=yes');
+            
+            mywindow.document.write('<html><head><title>Hóa đơn bán hàng</title><style>body{margin-block-start:0px;margin-block-end:0px;margin:0px;padding:0px;}img{width:100%}</style>');
+                    
+            mywindow.document.write('</head><body style="width:<?php echo $kich_thuoc;?>;margin:0px;padding:0px;">');
+            mywindow.document.write(data);          
+            mywindow.document.write('</body></html>');
+            mywindow.focus();           
+            setTimeout(() => { mywindow.print();mywindow.close(); }, 1000);
+      });    
+</script>
