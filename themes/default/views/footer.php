@@ -41,7 +41,7 @@
     <i class="fa fa-chevron-circle-up"></i>
 </a>
 
-    <p style="text-align:center;" class="no-print">&copy; <?= date('Y') . " " . $Settings->site_name; ?> - <span><b>Power by <a href="https://alphasoftware.vn/" target="_blank"><font color="#ff0000">Alpha</font><font color="#fff200">group</font><font color="#ff0000">.vn</font></a></b></span>
+    <p style="text-align:center;" class="no-print">&copy; <?= date('Y') . " " . $Settings->site_name; ?> - <span><b>Power by <a href="https://eragenai.com/" target="_blank">EragenAI.com</a></b></span>
         <?php if ($_SERVER["REMOTE_ADDR"] == '127.0.0.1') {
             echo ' - Page rendered in <strong>{elapsed_time}</strong> seconds';
         } ?></p>
