@@ -30563,13 +30563,13 @@ class mPDF
 		if ($size == 'thin')
 			$size = 1 * (25.4 / $this->dpi); //1 pixel width for table borders
 		elseif (stristr($size, 'px'))
-			$size *= (25.4 / $this->dpi); //pixels
+			$size = (float) $size * (25.4 / $this->dpi); //pixels
 		elseif (stristr($size, 'cm'))
-			$size *= 10; //centimeters
+			$size = (float) $size * 10; //centimeters
 		elseif (stristr($size, 'mm'))
 			$size += 0; //millimeters
 		elseif (stristr($size, 'pt'))
-			$size *= 25.4 / 72; //72 pts/inch
+			$size = (float) $size * 25.4 / 72; //72 pts/inch
 		elseif (stristr($size, 'rem')) {
 			$size += 0; //make "0.83rem" become simply "0.83"
 			$size *= ($this->default_font_size / _MPDFK);
@@ -30588,9 +30588,9 @@ class mPDF
 				$size *= $maxsize / 100;
 			}
 		} elseif (stristr($size, 'in'))
-			$size *= 25.4; //inches
+			$size = (float) $size * 25.4; //inches
 		elseif (stristr($size, 'pc'))
-			$size *= 38.1 / 9; //PostScript picas
+			$size = (float) $size * 38.1 / 9; //PostScript picas
 		elseif (stristr($size, 'ex')) { // Approximates "ex" as half of font height
 			$size += 0; //make "3.5ex" become simply "3.5"
 			if ($fontsize) {
@@ -30645,7 +30645,7 @@ class mPDF
 				$size = $maxsize * 2;
 			}
 		} else
-			$size *= (25.4 / $this->dpi); //nothing == px
+			$size = (float) $size * (25.4 / $this->dpi); //nothing == px
 
 		return $size;
 	}
