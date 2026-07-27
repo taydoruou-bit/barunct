@@ -21,9 +21,15 @@ $summary = isset($dashboard_summary) && $dashboard_summary ? $dashboard_summary 
 $sales_today_total = isset($summary->sales_today_total) ? $summary->sales_today_total : 0;
 $sales_month_total = isset($summary->sales_month_total) ? $summary->sales_month_total : 0;
 $sales_month_paid = isset($summary->sales_month_paid) ? $summary->sales_month_paid : 0;
+$sales_month_due = isset($summary->sales_month_due) ? $summary->sales_month_due : 0;
 $quotes_month_total = isset($summary->quotes_month_total) ? $summary->quotes_month_total : 0;
 $purchases_month_total = isset($summary->purchases_month_total) ? $summary->purchases_month_total : 0;
 $collection_rate = $sales_month_total > 0 ? round(($sales_month_paid / $sales_month_total) * 100) : 0;
+$sales_month_count = isset($summary->sales_month_count) ? (int) $summary->sales_month_count : 0;
+$quotes_month_count = isset($summary->quotes_month_count) ? (int) $summary->quotes_month_count : 0;
+$quotes_completed_count = isset($summary->quotes_completed_count) ? (int) $summary->quotes_completed_count : 0;
+$quote_conversion_rate = $quotes_month_count > 0 ? round(($quotes_completed_count / $quotes_month_count) * 100) : 0;
+$average_sale_value = $sales_month_count > 0 ? ($sales_month_total / $sales_month_count) : 0;
 $can_products = $Owner || $Admin || !empty($GP['products-index']);
 $can_sales = $Owner || $Admin || !empty($GP['sales-index']);
 $can_quotes = $Owner || $Admin || !empty($GP['quotes-index']);
@@ -85,37 +91,37 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
     }
     .metric-card {
         margin-top: 16px;
-        min-height: 132px;
-        padding: 18px;
+        min-height: 116px;
+        padding: 16px;
         position: relative;
     }
     .metric-icon {
         align-items: center;
-        border-radius: 16px;
+        border-radius: 12px;
         color: #fff;
         display: flex;
-        font-size: 22px;
-        height: 46px;
+        font-size: 15px;
+        height: 34px;
         justify-content: center;
         position: absolute;
-        right: 16px;
-        top: 16px;
-        width: 46px;
+        right: 14px;
+        top: 14px;
+        width: 34px;
     }
     .metric-label {
         color: #64748b;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
         letter-spacing: .08em;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         text-transform: uppercase;
     }
     .metric-value {
         color: #0f172a;
-        font-size: 21px;
+        font-size: 19px;
         font-weight: 900;
         line-height: 1.1;
-        padding-right: 54px;
+        padding-right: 38px;
     }
     .metric-sub {
         color: #64748b;
@@ -156,9 +162,86 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
     }
     .modern-action i {
         color: #2563eb;
-        font-size: 22px;
+        font-size: 17px;
         margin-right: 8px;
         vertical-align: middle;
+    }
+    .insight-tabs {
+        border-bottom: 1px solid #e8eef5;
+        margin-bottom: 14px;
+    }
+    .insight-tabs > li > a {
+        border: 0 !important;
+        border-radius: 999px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 800;
+        margin: 0 8px 10px 0;
+        padding: 9px 14px;
+    }
+    .insight-tabs > li.active > a,
+    .insight-tabs > li.active > a:hover,
+    .insight-tabs > li > a:hover {
+        background: #eef6ff !important;
+        color: #0369a1 !important;
+    }
+    .insight-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    .insight-item {
+        background: #f8fafc;
+        border: 1px solid #edf2f7;
+        border-radius: 14px;
+        padding: 14px;
+    }
+    .insight-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+    .insight-value {
+        color: #0f172a;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1.2;
+    }
+    .insight-note {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+    .mini-data-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .mini-data-list li {
+        align-items: center;
+        border-bottom: 1px solid #edf2f7;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        padding: 10px 0;
+    }
+    .mini-data-list li:last-child {
+        border-bottom: 0;
+    }
+    .mini-data-title {
+        color: #0f172a;
+        font-weight: 800;
+    }
+    .mini-data-meta {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+    .mini-data-amount {
+        color: #0f172a;
+        font-weight: 900;
+        white-space: nowrap;
     }
     .activity-list {
         list-style: none;
@@ -271,6 +354,107 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
                 <div class="metric-label">Tồn kho cần chú ý</div>
                 <div class="metric-value"><?= isset($summary->low_stock_count) ? (int) $summary->low_stock_count : 0; ?></div>
                 <div class="metric-sub"><?= isset($summary->products_count) ? (int) $summary->products_count : 0; ?> sản phẩm · <?= isset($summary->customers_count) ? (int) $summary->customers_count : 0; ?> khách hàng</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="modern-panel">
+                <div class="modern-panel-title"><i class="fa fa-pie-chart"></i> Góc nhìn điều hành</div>
+                <ul id="dashboardInsightTab" class="nav nav-tabs insight-tabs">
+                    <li class="active"><a href="#insight-quotes" data-toggle="tab"><i class="fa fa-files-o"></i> Báo giá</a></li>
+                    <li><a href="#insight-revenue" data-toggle="tab"><i class="fa fa-line-chart"></i> Doanh thu</a></li>
+                    <li><a href="#insight-related" data-toggle="tab"><i class="fa fa-database"></i> Dữ liệu liên quan</a></li>
+                </ul>
+                <div class="tab-content" style="border:0;padding:0;">
+                    <div id="insight-quotes" class="tab-pane fade in active">
+                        <div class="insight-grid">
+                            <div class="insight-item">
+                                <div class="insight-label">Giá trị báo giá tháng</div>
+                                <div class="insight-value"><?= $this->sma->formatMoney($quotes_month_total); ?></div>
+                                <div class="insight-note"><?= $quotes_month_count; ?> báo giá phát sinh</div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-label">Báo giá đang theo</div>
+                                <div class="insight-value"><?= isset($summary->quotes_open_count) ? (int) $summary->quotes_open_count : 0; ?></div>
+                                <div class="insight-note">Pending/Sent cần chăm sóc</div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-label">Đã chốt trong tháng</div>
+                                <div class="insight-value"><?= $quotes_completed_count; ?></div>
+                                <div class="insight-note">Tỷ lệ chốt <?= $quote_conversion_rate; ?>%</div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-label">Trạng thái báo giá</div>
+                                <div class="insight-value"><?= isset($summary->quotes_pending_count) ? (int) $summary->quotes_pending_count : 0; ?> / <?= isset($summary->quotes_sent_count) ? (int) $summary->quotes_sent_count : 0; ?></div>
+                                <div class="insight-note">Chờ xử lý / đã gửi</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="insight-revenue" class="tab-pane fade">
+                        <div class="insight-grid">
+                            <div class="insight-item">
+                                <div class="insight-label">Doanh thu tháng</div>
+                                <div class="insight-value"><?= $this->sma->formatMoney($sales_month_total); ?></div>
+                                <div class="insight-note"><?= $sales_month_count; ?> đơn hàng</div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-label">Đã thu</div>
+                                <div class="insight-value"><?= $this->sma->formatMoney($sales_month_paid); ?></div>
+                                <div class="insight-note">Tỷ lệ thu <?= $collection_rate; ?>%</div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-label">Còn phải thu</div>
+                                <div class="insight-value"><?= $this->sma->formatMoney($sales_month_due); ?></div>
+                                <div class="insight-note"><?= isset($summary->sales_due_count) ? (int) $summary->sales_due_count : 0; ?> đơn còn công nợ</div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-label">Giá trị đơn TB</div>
+                                <div class="insight-value"><?= $this->sma->formatMoney($average_sale_value); ?></div>
+                                <div class="insight-note">Theo doanh thu tháng</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="insight-related" class="tab-pane fade">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ul class="mini-data-list">
+                                    <?php if (!empty($quotes)) {
+                                        foreach (array_slice($quotes, 0, 4) as $item) { ?>
+                                            <li>
+                                                <div>
+                                                    <div class="mini-data-title">BG <?= $item->reference_no; ?></div>
+                                                    <div class="mini-data-meta"><?= $item->customer; ?> · <?= $this->sma->hrld($item->date); ?></div>
+                                                </div>
+                                                <div class="mini-data-amount"><?= $this->sma->formatMoney($item->grand_total); ?></div>
+                                            </li>
+                                        <?php }
+                                    } else { ?>
+                                        <li><div class="mini-data-meta">Chưa có báo giá mới.</div></li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <ul class="mini-data-list">
+                                    <?php if (!empty($sales)) {
+                                        foreach (array_slice($sales, 0, 4) as $item) { ?>
+                                            <li>
+                                                <div>
+                                                    <div class="mini-data-title">Đơn <?= $item->reference_no; ?></div>
+                                                    <div class="mini-data-meta"><?= $item->customer; ?> · <?= $this->sma->hrld($item->date); ?></div>
+                                                </div>
+                                                <div class="mini-data-amount"><?= $this->sma->formatMoney($item->grand_total); ?></div>
+                                            </li>
+                                        <?php }
+                                    } else { ?>
+                                        <li><div class="mini-data-meta">Chưa có đơn bán mới.</div></li>
+                                    <?php } ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
