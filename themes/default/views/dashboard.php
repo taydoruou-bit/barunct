@@ -44,16 +44,16 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         margin-bottom: 20px;
     }
     .dashboard-hero {
-        background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 52%, #2563eb 100%);
+        background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 48%, #2563eb 100%);
         border-radius: 22px;
         color: #fff;
         padding: 26px 28px;
-        box-shadow: 0 18px 45px rgba(15, 118, 110, .22);
+        box-shadow: 0 20px 48px rgba(79, 70, 229, .22);
         overflow: hidden;
         position: relative;
     }
     .dashboard-hero:after {
-        background: rgba(255, 255, 255, .12);
+        background: rgba(255, 255, 255, .16);
         border-radius: 50%;
         content: "";
         height: 260px;
@@ -77,23 +77,30 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         margin-top: 18px;
     }
     .dashboard-hero-actions .btn {
-        border: 0;
+        background: rgba(255, 255, 255, .9);
+        border: 1px solid rgba(255, 255, 255, .58);
         border-radius: 999px;
+        color: #312e81;
         font-weight: 700;
         margin: 0 8px 8px 0;
         padding: 10px 16px;
     }
     .metric-card, .modern-panel, .modern-action {
-        background: #fff;
-        border: 1px solid #e8eef5;
+        background: rgba(255, 255, 255, .92);
+        border: 1px solid rgba(226, 232, 240, .9);
         border-radius: 18px;
-        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+        box-shadow: 0 14px 32px rgba(99, 102, 241, .08);
     }
     .metric-card {
         margin-top: 16px;
         min-height: 116px;
         padding: 16px;
         position: relative;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .metric-card:hover {
+        box-shadow: 0 18px 40px rgba(99, 102, 241, .14);
+        transform: translateY(-2px);
     }
     .metric-icon {
         align-items: center;
@@ -128,16 +135,17 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         font-size: 12px;
         margin-top: 10px;
     }
-    .bg-teal { background: linear-gradient(135deg, #14b8a6, #0f766e); }
-    .bg-blue { background: linear-gradient(135deg, #38bdf8, #2563eb); }
-    .bg-orange { background: linear-gradient(135deg, #fb923c, #ea580c); }
+    .bg-teal { background: linear-gradient(135deg, #2dd4bf, #06b6d4); }
+    .bg-blue { background: linear-gradient(135deg, #818cf8, #2563eb); }
+    .bg-orange { background: linear-gradient(135deg, #fbbf24, #f97316); }
     .bg-red { background: linear-gradient(135deg, #fb7185, #e11d48); }
+    .bg-purple { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
     .modern-panel {
         margin-top: 16px;
         padding: 18px;
     }
     .modern-panel-title {
-        color: #0f172a;
+        color: #312e81;
         font-size: 16px;
         font-weight: 900;
         margin-bottom: 14px;
@@ -156,18 +164,18 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         transition: all .18s ease;
     }
     .modern-action:hover {
-        color: #2563eb;
+        color: #7c3aed;
         text-decoration: none;
         transform: translateY(-2px);
     }
     .modern-action i {
-        color: #2563eb;
+        color: #7c3aed;
         font-size: 17px;
         margin-right: 8px;
         vertical-align: middle;
     }
     .insight-tabs {
-        border-bottom: 1px solid #e8eef5;
+        border-bottom: 1px solid #e9d5ff;
         margin-bottom: 14px;
     }
     .insight-tabs > li > a {
@@ -182,8 +190,8 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
     .insight-tabs > li.active > a,
     .insight-tabs > li.active > a:hover,
     .insight-tabs > li > a:hover {
-        background: #eef6ff !important;
-        color: #0369a1 !important;
+        background: linear-gradient(135deg, #f5f3ff, #ecfeff) !important;
+        color: #6d28d9 !important;
     }
     .insight-grid {
         display: grid;
@@ -191,8 +199,8 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
     .insight-item {
-        background: #f8fafc;
-        border: 1px solid #edf2f7;
+        background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
+        border: 1px solid #ede9fe;
         border-radius: 14px;
         padding: 14px;
     }
@@ -203,7 +211,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         margin-bottom: 8px;
     }
     .insight-value {
-        color: #0f172a;
+        color: #312e81;
         font-size: 20px;
         font-weight: 900;
         line-height: 1.2;
@@ -230,7 +238,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         border-bottom: 0;
     }
     .mini-data-title {
-        color: #0f172a;
+        color: #312e81;
         font-weight: 800;
     }
     .mini-data-meta {
@@ -239,7 +247,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         margin-top: 2px;
     }
     .mini-data-amount {
-        color: #0f172a;
+        color: #312e81;
         font-weight: 900;
         white-space: nowrap;
     }
@@ -318,7 +326,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         </div>
         <div class="col-md-2 col-sm-4 col-xs-6">
             <div class="metric-card">
-                <div class="metric-icon bg-blue"><i class="fa fa-calendar-check-o"></i></div>
+                <div class="metric-icon bg-purple"><i class="fa fa-calendar-check-o"></i></div>
                 <div class="metric-label">Doanh số tháng</div>
                 <div class="metric-value"><?= $this->sma->formatMoney($sales_month_total); ?></div>
                 <div class="metric-sub"><?= isset($summary->sales_month_count) ? (int) $summary->sales_month_count : 0; ?> đơn trong tháng</div>
@@ -326,7 +334,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         </div>
         <div class="col-md-2 col-sm-4 col-xs-6">
             <div class="metric-card">
-                <div class="metric-icon bg-teal"><i class="fa fa-credit-card"></i></div>
+                <div class="metric-icon bg-blue"><i class="fa fa-credit-card"></i></div>
                 <div class="metric-label">Đã thu tháng</div>
                 <div class="metric-value"><?= $this->sma->formatMoney($sales_month_paid); ?></div>
                 <div class="metric-sub">Tỷ lệ thu <?= $collection_rate; ?>%</div>
