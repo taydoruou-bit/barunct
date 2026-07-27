@@ -9,7 +9,7 @@ Class MY_Profiler extends CI_Profiler
         $fields_displayed = 0;
 
         foreach ($this->_available_sections as $section) {
-            if ($this->_compile_{$section} !== FALSE) {
+            if ($this->{'_compile_'.$section} !== FALSE) {
                 $func = '_compile_' . $section;
                 $output .= $this->{$func}();
                 $fields_displayed++;
