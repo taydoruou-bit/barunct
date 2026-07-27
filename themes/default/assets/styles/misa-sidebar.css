@@ -1,7 +1,7 @@
 /* MISA ERP-inspired left navigation */
 .misa-erp-shell {
-    background: radial-gradient(circle at top left, #f5f3ff 0, #eef6ff 38%, #f8fafc 78%);
-    color: #172b4d;
+    background: linear-gradient(180deg, #eefbfb 0%, #f7fafc 42%, #ffffff 100%);
+    color: #123047;
 }
 
 .misa-erp-shell #navbar.navbar {
@@ -9,28 +9,28 @@
     backdrop-filter: blur(14px);
     border: 0;
     border-bottom: 1px solid #e5edf5;
-    box-shadow: 0 8px 24px rgba(99, 102, 241, .08);
+    box-shadow: 0 8px 22px rgba(0, 128, 137, .08);
     min-height: 56px;
 }
 
 .misa-erp-shell .navbar .navbar-brand,
 .misa-erp-shell .navbar .navbar-brand:hover,
 .misa-erp-shell .navbar .navbar-brand:focus {
-    color: #4f46e5;
+    color: #008c95;
     height: 56px;
     line-height: 54px;
     padding: 0 18px;
 }
 
 .misa-erp-shell .navbar .navbar-brand small {
-    color: #4f46e5;
+    color: #008c95;
     font-size: 17px;
     font-weight: 800;
     letter-spacing: .01em;
 }
 
 .misa-erp-shell .navbar .navbar-brand i {
-    background: linear-gradient(135deg, #7c3aed, #06b6d4);
+    background: linear-gradient(135deg, #00a6b2, #2dd4bf);
     border-radius: 10px;
     color: #fff;
     height: 32px;
@@ -54,14 +54,14 @@
 }
 
 .misa-erp-shell #sidebar.menu-lhson {
-    background: linear-gradient(180deg, #111827 0%, #1e1b4b 54%, #312e81 100%) !important;
+    background: linear-gradient(180deg, #06252d 0%, #073843 56%, #075461 100%) !important;
     border-right: 1px solid rgba(255, 255, 255, .08);
-    box-shadow: 8px 0 28px rgba(49, 46, 129, .24);
+    box-shadow: 8px 0 26px rgba(6, 37, 45, .18);
     padding-top: 12px;
 }
 
 .misa-erp-shell #sidebar:before {
-    background: linear-gradient(180deg, #111827 0%, #1e1b4b 54%, #312e81 100%) !important;
+    background: linear-gradient(180deg, #06252d 0%, #073843 56%, #075461 100%) !important;
     border-right: 1px solid rgba(255, 255, 255, .08);
 }
 
@@ -110,16 +110,16 @@
 .misa-erp-shell .nav-list > li.mm_pos > a,
 .misa-erp-shell .nav-list > li.open.active > a {
     background: #fff !important;
-    color: #312e81 !important;
-    box-shadow: inset 4px 0 0 #22d3ee, 0 10px 22px rgba(34, 211, 238, .18);
+    color: #006b75 !important;
+    box-shadow: inset 4px 0 0 #00c2c7, 0 10px 22px rgba(0, 194, 199, .16);
 }
 
 .misa-erp-shell .nav-list > li.mm_pos_lhson > a {
-    background: linear-gradient(135deg, #fff 0%, #ecfeff 100%) !important;
+    background: linear-gradient(135deg, #fff 0%, #e6fffb 100%) !important;
     border: 0 !important;
     border-radius: 14px;
     box-shadow: 0 12px 24px rgba(2, 6, 23, .28);
-    color: #312e81 !important;
+    color: #006b75 !important;
     font-weight: 800;
     justify-content: flex-start;
     margin-bottom: 10px;
@@ -135,7 +135,7 @@
 .misa-erp-shell .nav-list > li > a > i:first-child {
     background: rgba(255, 255, 255, .92);
     border-radius: 10px;
-    color: #4f46e5;
+    color: #008c95;
     flex: 0 0 30px;
     font-size: 15px;
     height: 30px;
@@ -146,7 +146,7 @@
 }
 
 .misa-erp-shell .nav-list > li.mm_pos_lhson > a > i:first-child {
-    background: linear-gradient(135deg, #7c3aed, #06b6d4);
+    background: linear-gradient(135deg, #00a6b2, #2dd4bf);
     color: #fff;
 }
 
@@ -241,7 +241,7 @@
     background: rgba(255, 255, 255, .9);
     border: 1px solid rgba(226, 232, 240, .9);
     border-radius: 16px;
-    box-shadow: 0 14px 32px rgba(99, 102, 241, .08);
+    box-shadow: 0 12px 28px rgba(0, 128, 137, .08);
     overflow: hidden;
 }
 
@@ -251,7 +251,7 @@
 }
 
 .misa-erp-shell .box .box-header h2 {
-    color: #4f46e5;
+    color: #007c89;
     font-weight: 800;
 }
 
@@ -389,7 +389,7 @@
     background: linear-gradient(180deg, #fff 0%, #f8fbff 100%) !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 14px;
-    box-shadow: 0 18px 42px rgba(79, 70, 229, .2) !important;
+    box-shadow: 0 18px 42px rgba(0, 128, 137, .18) !important;
     display: none !important;
     left: calc(100% - 1px) !important;
     margin: 0 !important;
@@ -445,8 +445,8 @@
 
 .misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu > li > a:hover,
 .misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu > li.active > a {
-    background: #eef6ff !important;
-    color: #4f46e5 !important;
+    background: #e6fffb !important;
+    color: #007c89 !important;
 }
 
 .misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu > li > a > i {
@@ -456,7 +456,7 @@
 
 .misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu > li > a:hover > i,
 .misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu > li.active > a > i {
-    color: #4f46e5;
+    color: #007c89;
 }
 
 .misa-erp-shell #sidebar.menu-lhson .nav-list > li.mm_reports > .submenu,

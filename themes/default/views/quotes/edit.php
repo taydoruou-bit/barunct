@@ -324,22 +324,22 @@ $('#saveCustomOptions').click(function(e) {
     }
     .quote-edit-workspace > .box-header {
         align-items: center;
-        background: linear-gradient(135deg, #312e81 0%, #7c3aed 52%, #06b6d4 100%);
+        background: linear-gradient(135deg, #007c89 0%, #00a6b2 54%, #2dd4bf 100%);
         border: 0;
-        border-radius: 18px;
-        box-shadow: 0 16px 38px rgba(79, 70, 229, .22);
+        border-radius: 15px;
+        box-shadow: 0 14px 34px rgba(0, 128, 137, .18);
         color: #fff;
         display: flex;
         justify-content: space-between;
         margin-bottom: 14px;
-        padding: 14px 18px;
+        padding: 12px 16px;
         position: sticky;
         top: 54px;
         z-index: 95;
     }
     .quote-edit-workspace > .box-header h2 {
         color: #fff !important;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 900;
         margin: 0;
     }
@@ -357,7 +357,7 @@ $('#saveCustomOptions').click(function(e) {
     }
     .quote-edit-workspace .main-task-lhson .btn-primary {
         background: #fff !important;
-        color: #312e81 !important;
+        color: #007c89 !important;
         box-shadow: 0 10px 24px rgba(15, 23, 42, .14);
     }
     .quote-edit-workspace .main-task-lhson .btn-default {
@@ -375,15 +375,15 @@ $('#saveCustomOptions').click(function(e) {
     }
     .quote-helper-item {
         background: rgba(255, 255, 255, .92);
-        border: 1px solid #ede9fe;
-        border-radius: 14px;
-        box-shadow: 0 10px 24px rgba(99, 102, 241, .08);
+        border: 1px solid #ccfbf1;
+        border-radius: 12px;
+        box-shadow: 0 10px 22px rgba(0, 128, 137, .08);
         color: #334155;
         font-weight: 800;
-        padding: 12px;
+        padding: 10px 12px;
     }
     .quote-helper-item i {
-        background: linear-gradient(135deg, #a78bfa, #06b6d4);
+        background: linear-gradient(135deg, #00a6b2, #2dd4bf);
         border-radius: 10px;
         color: #fff;
         height: 28px;
@@ -394,7 +394,7 @@ $('#saveCustomOptions').click(function(e) {
     }
     .quote-editor-main {
         display: flex;
-        gap: 16px;
+        gap: 14px;
         align-items: flex-start;
     }
     .quote-products-panel {
@@ -402,7 +402,7 @@ $('#saveCustomOptions').click(function(e) {
         min-width: 0;
     }
     .quote-info-panel {
-        flex: 0 0 390px;
+        flex: 0 0 350px;
         max-height: calc(100vh - 140px);
         overflow-y: auto;
         position: sticky;
@@ -411,10 +411,10 @@ $('#saveCustomOptions').click(function(e) {
     .quote-edit-workspace #sticker {
         background: rgba(255, 255, 255, .94);
         border: 1px solid #e0f2fe;
-        border-radius: 16px;
-        box-shadow: 0 14px 28px rgba(14, 165, 233, .1);
+        border-radius: 14px;
+        box-shadow: 0 12px 26px rgba(0, 128, 137, .1);
         margin-bottom: 12px;
-        padding: 12px;
+        padding: 10px;
         position: sticky;
         top: 126px;
         z-index: 60;
@@ -424,19 +424,19 @@ $('#saveCustomOptions').click(function(e) {
         border-radius: 12px 0 0 12px;
         box-shadow: none;
         font-size: 15px;
-        height: 46px;
+        height: 42px;
     }
     .quote-edit-workspace #sticker .input-group-addon {
-        background: #f5f3ff;
+        background: #e6fffb;
         border: 0;
-        border-left: 1px solid #e0e7ff;
+        border-left: 1px solid #ccfbf1;
         border-radius: 0 12px 12px 0;
     }
     .quote-edit-workspace .table-group {
         background: #fff;
         border: 1px solid #e8eef5;
-        border-radius: 18px;
-        box-shadow: 0 14px 32px rgba(99, 102, 241, .08);
+        border-radius: 14px;
+        box-shadow: 0 12px 28px rgba(0, 128, 137, .08);
         overflow: hidden;
     }
     .quote-edit-workspace .table-controls {
@@ -444,13 +444,13 @@ $('#saveCustomOptions').click(function(e) {
     }
     .quote-edit-workspace #quTable {
         margin-bottom: 0;
-        min-width: 980px;
+        min-width: 920px;
     }
     .quote-edit-workspace #quTable thead th {
-        background: #f5f3ff;
-        border-color: #e9d5ff;
-        color: #312e81;
-        font-size: 12px;
+        background: #d8fbf7;
+        border-color: #a7f3d0;
+        color: #075985;
+        font-size: 11px;
         font-weight: 900;
         vertical-align: middle;
     }
@@ -459,25 +459,25 @@ $('#saveCustomOptions').click(function(e) {
     }
     .quote-edit-workspace .lhson_baogia_add {
         background: rgba(255, 255, 255, .94);
-        border: 1px solid #ede9fe;
-        border-radius: 18px;
-        box-shadow: 0 16px 34px rgba(99, 102, 241, .1);
-        padding: 14px 10px;
+        border: 1px solid #ccfbf1;
+        border-radius: 14px;
+        box-shadow: 0 14px 30px rgba(0, 128, 137, .1);
+        padding: 12px 10px;
         width: 100%;
     }
     .quote-edit-workspace .lhson_baogia_add:before {
-        color: #312e81;
+        color: #007c89;
         content: "Thông tin báo giá";
         display: block;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 900;
-        margin: 0 6px 12px;
+        margin: 0 6px 10px;
     }
     .quote-edit-workspace .lhson_baogia_add > .col-md-4,
     .quote-edit-workspace .lhson_baogia_add > .row > .col-sm-12 {
         padding-left: 6px;
         padding-right: 6px;
-        width: 50%;
+        width: 100%;
     }
     .quote-edit-workspace .lhson_baogia_add > .row,
     .quote-edit-workspace .lhson_baogia_add > #bt {
@@ -490,22 +490,22 @@ $('#saveCustomOptions').click(function(e) {
         width: 100%;
     }
     .quote-edit-workspace .lhson_baogia_add .form-group {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     .quote-edit-workspace .lhson_baogia_add label,
     .quote-edit-workspace .lhson_baogia_add .form-group > label,
     .quote-edit-workspace .lhson_baogia_add .form-group > .control-label {
         color: #475569;
         display: block;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
         margin-bottom: 5px;
     }
     .quote-edit-workspace .lhson_baogia_add .form-control,
     .quote-edit-workspace .lhson_baogia_add .select2-choice {
-        border-color: #dbeafe;
-        border-radius: 10px !important;
-        min-height: 36px;
+        border-color: #bfe9ee;
+        border-radius: 8px !important;
+        min-height: 34px;
     }
     .quote-edit-workspace #construction_address,
     .quote-edit-workspace #qunote {
@@ -513,11 +513,11 @@ $('#saveCustomOptions').click(function(e) {
         resize: vertical;
     }
     .quote-edit-workspace #bottom-total {
-        background: linear-gradient(135deg, #fff 0%, #f5f3ff 100%);
-        border: 1px solid #e9d5ff;
-        border-radius: 16px;
+        background: linear-gradient(135deg, #fff 0%, #e6fffb 100%);
+        border: 1px solid #ccfbf1;
+        border-radius: 14px;
         bottom: 0;
-        box-shadow: 0 -10px 28px rgba(99, 102, 241, .1);
+        box-shadow: 0 -10px 26px rgba(0, 128, 137, .1);
         margin-top: 14px;
         position: sticky;
         z-index: 50;
@@ -526,8 +526,8 @@ $('#saveCustomOptions').click(function(e) {
         background: transparent;
     }
     .quote-edit-workspace #bottom-total td {
-        border-color: #e9d5ff;
-        color: #312e81;
+        border-color: #ccfbf1;
+        color: #007c89;
         font-weight: 900;
     }
     @media (max-width: 1199px) {

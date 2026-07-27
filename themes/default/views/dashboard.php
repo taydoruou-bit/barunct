@@ -41,14 +41,15 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
 
 <style>
     .dashboard-modern {
-        margin-bottom: 20px;
+        margin-bottom: 14px;
     }
     .dashboard-hero {
-        background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 48%, #2563eb 100%);
-        border-radius: 22px;
+        background: linear-gradient(135deg, #008c95 0%, #00b8b8 50%, #2dd4bf 100%);
+        border: 1px solid rgba(255, 255, 255, .58);
+        border-radius: 16px;
         color: #fff;
-        padding: 26px 28px;
-        box-shadow: 0 20px 48px rgba(79, 70, 229, .22);
+        padding: 20px 24px;
+        box-shadow: 0 18px 42px rgba(0, 128, 137, .18);
         overflow: hidden;
         position: relative;
     }
@@ -56,15 +57,15 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         background: rgba(255, 255, 255, .16);
         border-radius: 50%;
         content: "";
-        height: 260px;
+        height: 230px;
         position: absolute;
         right: -70px;
         top: -100px;
-        width: 260px;
+        width: 230px;
     }
     .dashboard-hero h1 {
         color: #fff;
-        font-size: 28px;
+        font-size: 25px;
         font-weight: 800;
         margin: 0 0 8px;
     }
@@ -74,58 +75,58 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         margin: 0;
     }
     .dashboard-hero-actions {
-        margin-top: 18px;
+        margin-top: 16px;
     }
     .dashboard-hero-actions .btn {
         background: rgba(255, 255, 255, .9);
         border: 1px solid rgba(255, 255, 255, .58);
         border-radius: 999px;
-        color: #312e81;
+        color: #006b75;
         font-weight: 700;
         margin: 0 8px 8px 0;
-        padding: 10px 16px;
+        padding: 8px 15px;
     }
     .metric-card, .modern-panel, .modern-action {
         background: rgba(255, 255, 255, .92);
         border: 1px solid rgba(226, 232, 240, .9);
-        border-radius: 18px;
-        box-shadow: 0 14px 32px rgba(99, 102, 241, .08);
+        border-radius: 14px;
+        box-shadow: 0 12px 28px rgba(0, 128, 137, .08);
     }
     .metric-card {
         margin-top: 16px;
-        min-height: 116px;
-        padding: 16px;
+        min-height: 104px;
+        padding: 14px;
         position: relative;
         transition: transform .18s ease, box-shadow .18s ease;
     }
     .metric-card:hover {
-        box-shadow: 0 18px 40px rgba(99, 102, 241, .14);
+        box-shadow: 0 16px 36px rgba(0, 128, 137, .14);
         transform: translateY(-2px);
     }
     .metric-icon {
         align-items: center;
-        border-radius: 12px;
+        border-radius: 11px;
         color: #fff;
         display: flex;
         font-size: 15px;
-        height: 34px;
+        height: 32px;
         justify-content: center;
         position: absolute;
         right: 14px;
         top: 14px;
-        width: 34px;
+        width: 32px;
     }
     .metric-label {
         color: #64748b;
         font-size: 11px;
         font-weight: 800;
         letter-spacing: .08em;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         text-transform: uppercase;
     }
     .metric-value {
         color: #0f172a;
-        font-size: 19px;
+        font-size: 18px;
         font-weight: 900;
         line-height: 1.1;
         padding-right: 38px;
@@ -133,19 +134,19 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
     .metric-sub {
         color: #64748b;
         font-size: 12px;
-        margin-top: 10px;
+        margin-top: 8px;
     }
-    .bg-teal { background: linear-gradient(135deg, #2dd4bf, #06b6d4); }
-    .bg-blue { background: linear-gradient(135deg, #818cf8, #2563eb); }
+    .bg-teal { background: linear-gradient(135deg, #00b8b8, #008c95); }
+    .bg-blue { background: linear-gradient(135deg, #38bdf8, #0284c7); }
     .bg-orange { background: linear-gradient(135deg, #fbbf24, #f97316); }
     .bg-red { background: linear-gradient(135deg, #fb7185, #e11d48); }
-    .bg-purple { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+    .bg-purple { background: linear-gradient(135deg, #5eead4, #0f766e); }
     .modern-panel {
         margin-top: 16px;
-        padding: 18px;
+        padding: 15px;
     }
     .modern-panel-title {
-        color: #312e81;
+        color: #007c89;
         font-size: 16px;
         font-weight: 900;
         margin-bottom: 14px;
@@ -164,18 +165,18 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         transition: all .18s ease;
     }
     .modern-action:hover {
-        color: #7c3aed;
+        color: #007c89;
         text-decoration: none;
         transform: translateY(-2px);
     }
     .modern-action i {
-        color: #7c3aed;
+        color: #007c89;
         font-size: 17px;
         margin-right: 8px;
         vertical-align: middle;
     }
     .insight-tabs {
-        border-bottom: 1px solid #e9d5ff;
+        border-bottom: 1px solid #ccfbf1;
         margin-bottom: 14px;
     }
     .insight-tabs > li > a {
@@ -185,13 +186,13 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         font-size: 13px;
         font-weight: 800;
         margin: 0 8px 10px 0;
-        padding: 9px 14px;
+        padding: 8px 13px;
     }
     .insight-tabs > li.active > a,
     .insight-tabs > li.active > a:hover,
     .insight-tabs > li > a:hover {
-        background: linear-gradient(135deg, #f5f3ff, #ecfeff) !important;
-        color: #6d28d9 !important;
+        background: linear-gradient(135deg, #e6fffb, #ecfeff) !important;
+        color: #007c89 !important;
     }
     .insight-grid {
         display: grid;
@@ -200,9 +201,9 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
     }
     .insight-item {
         background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
-        border: 1px solid #ede9fe;
-        border-radius: 14px;
-        padding: 14px;
+        border: 1px solid #ccfbf1;
+        border-radius: 12px;
+        padding: 12px;
     }
     .insight-label {
         color: #64748b;
@@ -211,8 +212,8 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         margin-bottom: 8px;
     }
     .insight-value {
-        color: #312e81;
-        font-size: 20px;
+        color: #007c89;
+        font-size: 19px;
         font-weight: 900;
         line-height: 1.2;
     }
@@ -238,7 +239,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         border-bottom: 0;
     }
     .mini-data-title {
-        color: #312e81;
+        color: #007c89;
         font-weight: 800;
     }
     .mini-data-meta {
@@ -247,7 +248,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         margin-top: 2px;
     }
     .mini-data-amount {
-        color: #312e81;
+        color: #007c89;
         font-weight: 900;
         white-space: nowrap;
     }
