@@ -402,9 +402,9 @@ $('#saveCustomOptions').click(function(e) {
         min-width: 0;
     }
     .quote-info-panel {
-        flex: 0 0 350px;
-        max-height: calc(100vh - 140px);
-        overflow-y: auto;
+        flex: 0 0 390px;
+        max-height: none;
+        overflow: visible;
         position: sticky;
         top: 126px;
     }
