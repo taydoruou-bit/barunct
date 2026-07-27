@@ -176,6 +176,7 @@
                                     }
                                 }
                                 ?>
+                                <th style="width:100px; text-align:center; background-color:#B4C6E7;"><strong>Ghi chú</strong></th>
                                 <th style="width:80px; text-align:center; background-color:#B4C6E7;"><strong><?= lang("quantity"); ?></strong></th>
                                 <th style="width:100px; text-align:center; background-color:#B4C6E7;"><strong><?= lang("unit_price"); ?></strong></th>
                                 <?php
@@ -187,7 +188,6 @@
                                 }
                                 ?>
                                 <th style="width:120px; text-align:center; background-color:#B4C6E7;"><strong><?= lang("subtotal"); ?></strong></th>
-                                <th style="width:100px; text-align:center; background-color:#B4C6E7;"><strong>Ghi chú</strong></th> <!-- ← DI CHUYỂN ĐẾN CUỐI -->
                             </tr>
                         </thead>
 
@@ -284,6 +284,11 @@
                                     }
                                     ?>
 
+                                    <!-- Ghi chú -->
+                                    <td style="text-align:center; vertical-align:middle;">
+                                        <?= !empty($main_row->notes) ? '<strong>' . $main_row->notes . '</strong>' : ''; ?>
+                                    </td>
+
                                     <!-- Số lượng -->
                                     <td style="text-align:center; vertical-align:middle;">
                                         <?= '<strong>' . $this->sma->formatQuantity($main_row->unit_quantity) . '</strong>'; ?>
@@ -335,10 +340,6 @@
                                         ?>
                                     </td>
 
-                                    <!-- Ghi chú - CUỐI CÙNG -->
-                                    <td style="text-align:center; vertical-align:middle;">
-                                        <?= !empty($main_row->notes) ? '<strong>' . $main_row->notes . '</strong>' : ''; ?>
-                                    </td>
                                 </tr>
                             <?php
                                 $r++;
@@ -376,6 +377,11 @@
                                         <strong>Khóa</strong>
                                     </td>
 
+                                    <!-- Ghi chú -->
+                                    <td style="text-align:center; vertical-align:middle;">
+                                        <!-- Để trống -->
+                                    </td>
+
                                     <!-- Số lượng -->
                                     <td style="text-align:center; vertical-align:middle;">
                                         <strong><?= $this->sma->formatQuantity($total_lock_qty); ?></strong>
@@ -405,10 +411,6 @@
                                         <strong><?= $this->sma->formatMoney($total_lock_price); ?></strong>
                                     </td>
 
-                                    <!-- Ghi chú (cột cuối cùng) -->
-                                    <td style="text-align:center; vertical-align:middle;">
-                                        <!-- Để trống -->
-                                    </td>
                                 </tr>
                             <?php
                                 $r++;
@@ -427,6 +429,10 @@
                                     <td colspan="<?= $merge_cols; ?>" style="text-align:right; vertical-align:middle; padding:8px;">
                                         <strong><?= $main_row->product_name; ?></strong>
                                         <?= $main_row->details ? '<br><small style="color:#777;">' . $main_row->details . '</small>' : ''; ?>
+                                    </td>
+
+                                    <td style="text-align:center; vertical-align:middle;">
+                                        <?= !empty($main_row->notes) ? '<strong>' . $main_row->notes . '</strong>' : ''; ?>
                                     </td>
 
                                     <td style="text-align:center; vertical-align:middle;">
@@ -449,10 +455,6 @@
                                         <strong><?= $this->sma->formatMoney($main_row->subtotal); ?></strong>
                                     </td>
 
-                                    <!-- Ghi chú - CUỐI CÙNG -->
-                                    <td style="text-align:center; vertical-align:middle;">
-                                        <?= !empty($main_row->notes) ? '<strong>' . $main_row->notes . '</strong>' : ''; ?>
-                                    </td>
                                 </tr>
                             <?php
                                 $r++;
@@ -464,31 +466,27 @@
                         // ✅ THAY THẾ PHẦN TÍNH TOÁN COLSPAN NÀY
 
                         // TÍNH TOÁN SỐ CỘT COLSPAN
-                        $col = 7; // STT + Mẫu-Mã + Màu + Khóa + Quantity + Unit Price + Subtotal
+                        $col = 8; // STT + Mẫu-Mã + Màu + Khóa + Ghi chú + Quantity + Unit Price + Subtotal
                         if (!empty($custom_columns)) {
                             $col += count($custom_columns);
                         }
+                        $adjustment_cols = 0;
                         if ($Settings->product_discount && $inv->product_discount != 0) {
                             $col++;
+                            $adjustment_cols++;
                         }
                         if ($Settings->tax1 && $inv->product_tax > 0) {
                             $col++;
+                            $adjustment_cols++;
                         }
-                        $col++; // Cộng thêm 1 cho cột Ghi chú
-
-                        // ✅ CÁCH TÍNH tcol MỚI - ĐẠO SỐ CỘT CẦN MERGE TỪ ĐẦU ĐẾN SUBTOTAL
-                        // tcol = STT + Mẫu-Mã + Màu + Khóa + Custom Columns + Quantity + Unit Price (KHÔNG TÍNH Tax, Discount, Subtotal, Ghi chú)
-                        $tcol = 6; // STT(1) + Mẫu-Mã(1) + Màu(1) + Khóa(1) + Qty(1) + Unit Price(1)
-                        if (!empty($custom_columns)) {
-                            $tcol += count($custom_columns);
-                        }
-                        // KHÔNG cộng thêm Tax, Discount, Subtotal, Ghi chú vào tcol
+                        $tcol = $col - 1;
+                        $total_detail_colspan = $tcol - $adjustment_cols;
                         ?>
 
                         <tfoot>
     <?php if ($inv->grand_total != $inv->total) { ?>
         <tr>
-            <td colspan="<?= $tcol; ?>"
+            <td colspan="<?= $total_detail_colspan; ?>"
                 style="text-align:right; padding-right:10px; font-weight:bold;"><?= lang("total"); ?>
                 (<?= $default_currency->code; ?>)
             </td>
@@ -501,20 +499,19 @@
             }
             ?>
             <td style="text-align:right; padding-right:10px; font-weight:bold;"><?= $this->sma->formatMoney($inv->total + $inv->product_tax); ?></td>
-            <td></td>
         </tr>
     <?php } ?>
 
     <?php if ($inv->order_discount != 0) {
-        echo '<tr><td colspan="' . $tcol . '" style="text-align:right; padding-right:10px; font-weight:bold;">' . lang("order_discount") . ' (' . $default_currency->code . ')</td><td style="text-align:right; padding-right:10px; font-weight:bold;">' . ($inv->order_discount_id ? '<small>(' . $inv->order_discount_id . ')</small> ' : '') . $this->sma->formatMoney($inv->order_discount) . '</td><td></td></tr>';
+        echo '<tr><td colspan="' . $tcol . '" style="text-align:right; padding-right:10px; font-weight:bold;">' . lang("order_discount") . ' (' . $default_currency->code . ')</td><td style="text-align:right; padding-right:10px; font-weight:bold;">' . ($inv->order_discount_id ? '<small>(' . $inv->order_discount_id . ')</small> ' : '') . $this->sma->formatMoney($inv->order_discount) . '</td></tr>';
     }
     ?>
     <?php if ($Settings->tax2 && $inv->order_tax != 0) {
-        echo '<tr><td colspan="' . $tcol . '" style="text-align:right; padding-right:10px; font-weight:bold;">' . lang("order_tax") . ' (' . $default_currency->code . ')</td><td style="text-align:right; padding-right:10px; font-weight:bold;">' . $this->sma->formatMoney($inv->order_tax) . '</td><td></td></tr>';
+        echo '<tr><td colspan="' . $tcol . '" style="text-align:right; padding-right:10px; font-weight:bold;">' . lang("order_tax") . ' (' . $default_currency->code . ')</td><td style="text-align:right; padding-right:10px; font-weight:bold;">' . $this->sma->formatMoney($inv->order_tax) . '</td></tr>';
     }
     ?>
     <?php if ($inv->shipping != 0) {
-        echo '<tr><td colspan="' . $tcol . '" style="text-align:right; padding-right:10px; font-weight:bold;">' . lang("shipping") . ' (' . $default_currency->code . ')</td><td style="text-align:right; padding-right:10px; font-weight:bold;">' . $this->sma->formatMoney($inv->shipping) . '</td><td></td></tr>';
+        echo '<tr><td colspan="' . $tcol . '" style="text-align:right; padding-right:10px; font-weight:bold;">' . lang("shipping") . ' (' . $default_currency->code . ')</td><td style="text-align:right; padding-right:10px; font-weight:bold;">' . $this->sma->formatMoney($inv->shipping) . '</td></tr>';
     }
     ?>
 
@@ -528,21 +525,6 @@
     <td style="text-align:center; padding-right:10px; font-weight:bold; color: #dc143c; background-color:#B4C6E7;">
         <?= $this->sma->formatMoney($inv->grand_total); ?>
     </td>
-    <?php if ($inv->deposit_amount && $inv->deposit_amount > 0) { ?>
-        <!-- ✅ HIỂN THỊ GHI CHÚ TỪ DB - ROWSPAN 3 -->
-        <td rowspan="3" style="background-color:#B4C6E7; vertical-align:middle; text-align:center; padding:8px;">
-            <?php if (!empty($inv->note)): ?>
-                <strong><?= nl2br($this->sma->decode_html($inv->note)); ?></strong>
-            <?php endif; ?>
-        </td>
-    <?php } else { ?>
-        <!-- ✅ KHÔNG CÓ ĐẶT CỌC THÌ CHỈ 1 DÒNG -->
-        <td style="background-color:#B4C6E7; vertical-align:middle; text-align:center; padding:8px;">
-            <?php if (!empty($inv->note)): ?>
-                <strong><?= nl2br($this->sma->decode_html($inv->note)); ?></strong>
-            <?php endif; ?>
-        </td>
-    <?php } ?>
 </tr>
 
 

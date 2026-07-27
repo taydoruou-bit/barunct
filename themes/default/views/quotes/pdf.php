@@ -595,6 +595,7 @@ div[style*="display: flex"] img.qrimg {
             }
         }
         ?>
+        <th style="width:100px;"><strong>Ghi chú</strong></th>
         <th style="width:80px;"><strong><?= lang("quantity"); ?></strong></th>
         <th style="width:100px;"><strong><?= lang("unit_price"); ?></strong></th>
         <?php
@@ -606,7 +607,6 @@ div[style*="display: flex"] img.qrimg {
         }
         ?>
         <th style="width:120px;"><strong><?= lang("subtotal"); ?></strong></th>
-        <th style="width:100px;"><strong>Ghi chú</strong></th>
     </tr>
                 <tbody>
                     <?php
@@ -680,6 +680,9 @@ if (!empty($custom_columns)) {
 }
 ?>
                         <td class="product-cell">
+                            <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
+                        </td>
+                        <td class="product-cell">
                             <strong><?= $this->sma->formatQuantity($main_row->unit_quantity); ?></strong>
                         </td>
                         <td class="product-cell">
@@ -720,9 +723,6 @@ if (!empty($custom_columns)) {
                             echo $this->sma->formatMoney($total_subtotal);
                             ?></strong>
                         </td>
-                        <td class="product-cell">
-    <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
-</td>
                     </tr>
                     <?php
                         $r++;
@@ -752,6 +752,7 @@ if (!empty($custom_columns)) {
                             <td colspan="<?= $lock_merge_cols; ?>" style="text-align:right;">
                                 <strong>Khóa</strong>
                             </td>
+                            <td class="product-cell"></td>
                             <td class="product-cell">
                                 <strong><?= $this->sma->formatQuantity($total_lock_qty); ?></strong>
                             </td>
@@ -771,7 +772,6 @@ if (!empty($custom_columns)) {
                             <td class="product-cell">
                                 <strong><?= $this->sma->formatMoney($total_lock_price); ?></strong>
                             </td>
-                            <td class="product-cell"></td>
                         </tr>
                     <?php
                         $r++;
@@ -792,6 +792,9 @@ if (!empty($custom_columns)) {
                                 <?= $main_row->details ? '<br><small><strong>' . $main_row->details . '</strong></small>' : ''; ?>
                             </td>
                             <td class="product-cell">
+                                <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
+                            </td>
+                            <td class="product-cell">
                                 <strong><?= $this->sma->formatQuantity($main_row->unit_quantity); ?></strong>
                             </td>
                             <td class="product-cell">
@@ -810,9 +813,6 @@ if (!empty($custom_columns)) {
                             <td class="product-cell">
                                 <strong><?= $this->sma->formatMoney($main_row->subtotal); ?></strong>
                             </td>
-<td class="product-cell">
-    <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
-</td>
                         </tr>
                     <?php
                         $r++;
@@ -821,31 +821,25 @@ if (!empty($custom_columns)) {
                 </tbody>
                 <tfoot>
                     <?php
-                    $col = 7;
+                    $col = 8;
                     if (!empty($custom_columns)) {
                         $col += count($custom_columns);
                     }
+                    $adjustment_cols = 0;
                     if ($Settings->product_discount && $inv->product_discount != 0) {
                         $col++;
+                        $adjustment_cols++;
                     }
                     if ($Settings->tax1 && $inv->product_tax > 0) {
                         $col++;
+                        $adjustment_cols++;
                     }
-                    $col++;
-
-                    if ($Settings->product_discount && $inv->product_discount != 0 && $Settings->tax1 && $inv->product_tax > 0) {
-                        $tcol = $col - 3;
-                    } elseif ($Settings->product_discount && $inv->product_discount != 0) {
-                        $tcol = $col - 2;
-                    } elseif ($Settings->tax1 && $inv->product_tax > 0) {
-                        $tcol = $col - 2;
-                    } else {
-                        $tcol = $col - 1;
-                    }
+                    $tcol = $col - 1;
+                    $total_detail_colspan = $tcol - $adjustment_cols;
                     ?>
                     <?php if ($inv->grand_total != $inv->total) { ?>
                         <tr>
-                            <td colspan="<?= $tcol; ?>" style="text-align:right; font-weight:bold;">
+                            <td colspan="<?= $total_detail_colspan; ?>" style="text-align:right; font-weight:bold;">
                                 <?= lang("total"); ?> (<?= $default_currency->code; ?>)
                             </td>
                             <?php
@@ -857,45 +851,41 @@ if (!empty($custom_columns)) {
                             }
                             ?>
                             <td style="text-align:right; font-weight:bold;"><?= $this->sma->formatMoney($inv->total + $inv->product_tax); ?></td>
-                            <td style="text-align:right; font-weight:bold;"></td>
                         </tr>
                     <?php } ?>
 
                     <?php if ($inv->order_discount != 0) {
-                        echo '<tr><td colspan="' . ($tcol) . '" style="text-align:right; font-weight:bold;">' . lang("order_discount") . ' (' . $default_currency->code . ')</td><td style="text-align:right; font-weight:bold;">' . ($inv->order_discount_id ? '<small>(' . $inv->order_discount_id . ')</small> ' : '') . $this->sma->formatMoney($inv->order_discount) . '</td><td style="text-align:right; font-weight:bold;"></td></tr>';
+                        echo '<tr><td colspan="' . ($tcol) . '" style="text-align:right; font-weight:bold;">' . lang("order_discount") . ' (' . $default_currency->code . ')</td><td style="text-align:right; font-weight:bold;">' . ($inv->order_discount_id ? '<small>(' . $inv->order_discount_id . ')</small> ' : '') . $this->sma->formatMoney($inv->order_discount) . '</td></tr>';
                     }
                     ?>
                     <?php if ($Settings->tax2 && $inv->order_tax != 0) {
-                        echo '<tr><td colspan="' . ($tcol) . '" style="text-align:right; font-weight:bold;">' . lang("order_tax") . ' (' . $default_currency->code . ')</td><td style="text-align:right; font-weight:bold;">' . $this->sma->formatMoney($inv->order_tax) . '</td><td style="text-align:right; font-weight:bold;"></td></tr>';
+                        echo '<tr><td colspan="' . ($tcol) . '" style="text-align:right; font-weight:bold;">' . lang("order_tax") . ' (' . $default_currency->code . ')</td><td style="text-align:right; font-weight:bold;">' . $this->sma->formatMoney($inv->order_tax) . '</td></tr>';
                     }
                     ?>
                     <?php if ($inv->shipping != 0) {
-                        echo '<tr><td colspan="' . ($tcol) . '" style="text-align:right; font-weight:bold;">' . lang("shipping") . ' (' . $default_currency->code . ')</td><td style="text-align:right; font-weight:bold;">' . $this->sma->formatMoney($inv->shipping) . '</td><td style="text-align:right; font-weight:bold;"></td></tr>';
+                        echo '<tr><td colspan="' . ($tcol) . '" style="text-align:right; font-weight:bold;">' . lang("shipping") . ' (' . $default_currency->code . ')</td><td style="text-align:right; font-weight:bold;">' . $this->sma->formatMoney($inv->shipping) . '</td></tr>';
                     }
                     ?>
                     <tr>
-                        <td colspan="<?= $tcol - 1; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
+                        <td colspan="<?= $tcol; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
                             <?= lang("total_amount"); ?> 
                         </td>
                         <td style="text-align:center; font-weight:bold; color: #dc143c;  background-color: #B4C6E7 !important;"><?= $this->sma->formatMoney($inv->grand_total); ?></td>
-                        <td style="text-align:center; font-weight:bold; "></td>
                     </tr>
                     <?php if ($inv->deposit_amount && $inv->deposit_amount > 0) { ?>
 <tr>
-    <td colspan="<?= $tcol - 1; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
+    <td colspan="<?= $tcol; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
         Tiền đặt cọc 
     </td>
     <td style="text-align:center; font-weight:bold; color: #dc143c;  background-color: #B4C6E7 !important;"><?= $this->sma->formatMoney($inv->deposit_amount); ?></td>
-    <td style="text-align:center; font-weight:bold;"></td>
 </tr>
 <tr>
-    <td colspan="<?= $tcol - 1; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
+    <td colspan="<?= $tcol; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
         Còn lại 
     </td>
     <td style="text-align:center; font-weight:bold; color: #dc143c;  background-color: #B4C6E7 !important;">
         <?= $this->sma->formatMoney($inv->grand_total - $inv->deposit_amount); ?>
     </td>
-    <td style="text-align:center; font-weight:bold;"></td>
 </tr>
 
 <?php } ?>
