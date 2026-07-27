@@ -402,11 +402,13 @@ $('#saveCustomOptions').click(function(e) {
         min-width: 0;
     }
     .quote-info-panel {
-        flex: 0 0 273px;
+        flex: 0 0 285px;
         max-height: none;
+        max-width: 285px;
         overflow: visible;
         position: sticky;
         top: 126px;
+        width: 285px;
     }
     .quote-edit-workspace #sticker {
         background: rgba(255, 255, 255, .94);
@@ -536,8 +538,9 @@ $('#saveCustomOptions').click(function(e) {
         }
         .quote-info-panel {
             max-height: none;
+            max-width: 285px;
             position: static;
-            width: 100%;
+            width: 285px;
         }
         .quote-helper-strip {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -557,6 +560,10 @@ $('#saveCustomOptions').click(function(e) {
         }
         .quote-edit-workspace .lhson_baogia_add > .col-md-4,
         .quote-edit-workspace .lhson_baogia_add > .row > .col-sm-12 {
+            width: 100%;
+        }
+        .quote-info-panel {
+            max-width: 100%;
             width: 100%;
         }
     }
