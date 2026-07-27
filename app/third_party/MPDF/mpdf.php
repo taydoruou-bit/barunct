@@ -30604,45 +30604,45 @@ class mPDF
 			$size = 5 * (25.4 / $this->dpi); //5 pixel width for table borders
 		elseif ($size == 'xx-small') {
 			if ($fontsize) {
-				$size *= $fontsize * 0.7;
+				$size = $fontsize * 0.7;
 			} else {
-				$size *= $maxsize * 0.7;
+				$size = $maxsize * 0.7;
 			}
 		} elseif ($size == 'x-small') {
 			if ($fontsize) {
-				$size *= $fontsize * 0.77;
+				$size = $fontsize * 0.77;
 			} else {
-				$size *= $maxsize * 0.77;
+				$size = $maxsize * 0.77;
 			}
 		} elseif ($size == 'small') {
 			if ($fontsize) {
-				$size *= $fontsize * 0.86;
+				$size = $fontsize * 0.86;
 			} else {
-				$size *= $maxsize * 0.86;
+				$size = $maxsize * 0.86;
 			}
 		} elseif ($size == 'medium') {
 			if ($fontsize) {
-				$size *= $fontsize;
+				$size = $fontsize;
 			} else {
-				$size *= $maxsize;
+				$size = $maxsize;
 			}
 		} elseif ($size == 'large') {
 			if ($fontsize) {
-				$size *= $fontsize * 1.2;
+				$size = $fontsize * 1.2;
 			} else {
-				$size *= $maxsize * 1.2;
+				$size = $maxsize * 1.2;
 			}
 		} elseif ($size == 'x-large') {
 			if ($fontsize) {
-				$size *= $fontsize * 1.5;
+				$size = $fontsize * 1.5;
 			} else {
-				$size *= $maxsize * 1.5;
+				$size = $maxsize * 1.5;
 			}
 		} elseif ($size == 'xx-large') {
 			if ($fontsize) {
-				$size *= $fontsize * 2;
+				$size = $fontsize * 2;
 			} else {
-				$size *= $maxsize * 2;
+				$size = $maxsize * 2;
 			}
 		} else
 			$size *= (25.4 / $this->dpi); //nothing == px
