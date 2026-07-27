@@ -475,3 +475,150 @@
     bottom: 18px;
     top: auto;
 }
+
+/* Compact topbar */
+.misa-erp-shell #navbar.navbar {
+    min-height: 44px !important;
+}
+
+.misa-erp-shell #navbar-container {
+    align-items: center;
+    display: flex;
+    min-height: 44px;
+}
+
+.misa-erp-shell .navbar-header.pull-left {
+    flex: 0 0 285px;
+}
+
+.misa-erp-shell .navbar .navbar-brand,
+.misa-erp-shell .navbar .navbar-brand:hover,
+.misa-erp-shell .navbar .navbar-brand:focus {
+    height: 44px !important;
+    line-height: 44px !important;
+    padding: 0 12px;
+}
+
+.misa-erp-shell .navbar .navbar-brand small {
+    font-size: 15px;
+}
+
+.misa-erp-shell .navbar .navbar-brand i {
+    border-radius: 9px;
+    height: 28px;
+    line-height: 28px;
+    margin-right: 7px;
+    width: 28px;
+}
+
+.misa-erp-shell .navbar-buttons.menu_posbasic {
+    flex: 1;
+    min-width: 0;
+}
+
+.misa-erp-shell .navbar .ace-nav {
+    align-items: center;
+    display: flex !important;
+    float: right;
+    gap: 6px;
+    height: 44px;
+}
+
+.misa-erp-shell .navbar .ace-nav > li {
+    border-left: 0;
+    height: 44px;
+}
+
+.misa-erp-shell .navbar .ace-nav > li > a,
+.misa-erp-shell .navbar .ace-nav > li > a:hover,
+.misa-erp-shell .navbar .ace-nav > li > a:focus {
+    align-items: center;
+    border-radius: 999px;
+    display: flex;
+    gap: 5px;
+    height: 34px !important;
+    line-height: 34px !important;
+    margin-top: 5px;
+    padding: 0 10px !important;
+    white-space: nowrap;
+}
+
+.misa-erp-shell .navbar .ace-nav > li > a:hover {
+    background: #e6fffb !important;
+    color: #007c89 !important;
+}
+
+.misa-erp-shell .navbar .ace-nav > li > a i {
+    font-size: 13px;
+}
+
+.misa-erp-shell .navbar .ace-nav > li > a span,
+.misa-erp-shell .navbar .ace-nav > li label span {
+    font-size: 11px;
+}
+
+.misa-erp-shell .navbar .ace-nav > li label {
+    align-items: center;
+    display: flex;
+    height: 44px;
+    justify-content: center;
+    margin: 0 !important;
+    width: auto !important;
+}
+
+.misa-erp-shell .navbar .ace-nav > li label > a {
+    align-items: center;
+    border-radius: 999px;
+    display: flex;
+    height: 34px;
+    padding: 0 10px;
+}
+
+.misa-erp-shell .navbar .ace-nav .nav-user-photo {
+    height: 30px;
+    margin: 0 6px 0 0;
+    width: 30px;
+}
+
+.misa-erp-shell .navbar .ace-nav .user-info {
+    line-height: 14px;
+    max-width: 72px;
+    top: 0;
+}
+
+.misa-erp-shell .navbar .ace-nav .user-info small {
+    line-height: 12px;
+}
+
+.misa-erp-shell .breadcrumbs {
+    align-items: center;
+    border-bottom: 1px solid #dbeff2;
+    display: flex;
+    min-height: 42px;
+    padding: 6px 14px;
+}
+
+.misa-erp-shell .breadcrumb {
+    flex: 1;
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.misa-erp-shell .breadcrumb > li {
+    font-size: 12px;
+}
+
+.misa-erp-shell #nav-search {
+    margin-left: 12px;
+    position: static;
+}
+
+.misa-erp-shell #nav-search .nav-search-input {
+    border-radius: 9px !important;
+    font-size: 12px;
+    height: 30px !important;
+    width: 210px !important;
+}
