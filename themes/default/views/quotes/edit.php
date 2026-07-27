@@ -402,7 +402,7 @@ $('#saveCustomOptions').click(function(e) {
         min-width: 0;
     }
     .quote-info-panel {
-        flex: 0 0 390px;
+        flex: 0 0 273px;
         max-height: none;
         overflow: visible;
         position: sticky;
