@@ -316,8 +316,253 @@ $('#saveCustomOptions').click(function(e) {
     });
 </script>
 
+<style>
+    .quote-edit-workspace {
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+    .quote-edit-workspace > .box-header {
+        align-items: center;
+        background: linear-gradient(135deg, #312e81 0%, #7c3aed 52%, #06b6d4 100%);
+        border: 0;
+        border-radius: 18px;
+        box-shadow: 0 16px 38px rgba(79, 70, 229, .22);
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 14px;
+        padding: 14px 18px;
+        position: sticky;
+        top: 54px;
+        z-index: 95;
+    }
+    .quote-edit-workspace > .box-header h2 {
+        color: #fff !important;
+        font-size: 20px;
+        font-weight: 900;
+        margin: 0;
+    }
+    .quote-edit-workspace .main-task-lhson {
+        display: flex;
+        gap: 8px;
+        margin: 0;
+        position: static;
+    }
+    .quote-edit-workspace .main-task-lhson .btn {
+        border: 0;
+        border-radius: 999px;
+        font-weight: 800;
+        padding: 9px 16px;
+    }
+    .quote-edit-workspace .main-task-lhson .btn-primary {
+        background: #fff !important;
+        color: #312e81 !important;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .14);
+    }
+    .quote-edit-workspace .main-task-lhson .btn-default {
+        background: rgba(255, 255, 255, .16) !important;
+        color: #fff !important;
+    }
+    .quote-edit-workspace .box-content {
+        padding: 0;
+    }
+    .quote-helper-strip {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        margin-bottom: 14px;
+    }
+    .quote-helper-item {
+        background: rgba(255, 255, 255, .92);
+        border: 1px solid #ede9fe;
+        border-radius: 14px;
+        box-shadow: 0 10px 24px rgba(99, 102, 241, .08);
+        color: #334155;
+        font-weight: 800;
+        padding: 12px;
+    }
+    .quote-helper-item i {
+        background: linear-gradient(135deg, #a78bfa, #06b6d4);
+        border-radius: 10px;
+        color: #fff;
+        height: 28px;
+        line-height: 28px;
+        margin-right: 8px;
+        text-align: center;
+        width: 28px;
+    }
+    .quote-editor-main {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    .quote-products-panel {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    .quote-info-panel {
+        flex: 0 0 390px;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        position: sticky;
+        top: 126px;
+    }
+    .quote-edit-workspace #sticker {
+        background: rgba(255, 255, 255, .94);
+        border: 1px solid #e0f2fe;
+        border-radius: 16px;
+        box-shadow: 0 14px 28px rgba(14, 165, 233, .1);
+        margin-bottom: 12px;
+        padding: 12px;
+        position: sticky;
+        top: 126px;
+        z-index: 60;
+    }
+    .quote-edit-workspace #add_item {
+        border: 0;
+        border-radius: 12px 0 0 12px;
+        box-shadow: none;
+        font-size: 15px;
+        height: 46px;
+    }
+    .quote-edit-workspace #sticker .input-group-addon {
+        background: #f5f3ff;
+        border: 0;
+        border-left: 1px solid #e0e7ff;
+        border-radius: 0 12px 12px 0;
+    }
+    .quote-edit-workspace .table-group {
+        background: #fff;
+        border: 1px solid #e8eef5;
+        border-radius: 18px;
+        box-shadow: 0 14px 32px rgba(99, 102, 241, .08);
+        overflow: hidden;
+    }
+    .quote-edit-workspace .table-controls {
+        overflow-x: auto;
+    }
+    .quote-edit-workspace #quTable {
+        margin-bottom: 0;
+        min-width: 980px;
+    }
+    .quote-edit-workspace #quTable thead th {
+        background: #f5f3ff;
+        border-color: #e9d5ff;
+        color: #312e81;
+        font-size: 12px;
+        font-weight: 900;
+        vertical-align: middle;
+    }
+    .quote-edit-workspace #quTable tbody td {
+        vertical-align: middle;
+    }
+    .quote-edit-workspace .lhson_baogia_add {
+        background: rgba(255, 255, 255, .94);
+        border: 1px solid #ede9fe;
+        border-radius: 18px;
+        box-shadow: 0 16px 34px rgba(99, 102, 241, .1);
+        padding: 14px 10px;
+        width: 100%;
+    }
+    .quote-edit-workspace .lhson_baogia_add:before {
+        color: #312e81;
+        content: "Thông tin báo giá";
+        display: block;
+        font-size: 16px;
+        font-weight: 900;
+        margin: 0 6px 12px;
+    }
+    .quote-edit-workspace .lhson_baogia_add > .col-md-4,
+    .quote-edit-workspace .lhson_baogia_add > .row > .col-sm-12 {
+        padding-left: 6px;
+        padding-right: 6px;
+        width: 50%;
+    }
+    .quote-edit-workspace .lhson_baogia_add > .row,
+    .quote-edit-workspace .lhson_baogia_add > #bt {
+        clear: both;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .quote-edit-workspace .lhson_baogia_add > #bt > .col-sm-12,
+    .quote-edit-workspace .lhson_baogia_add #construction_address {
+        width: 100%;
+    }
+    .quote-edit-workspace .lhson_baogia_add .form-group {
+        margin-bottom: 10px;
+    }
+    .quote-edit-workspace .lhson_baogia_add label,
+    .quote-edit-workspace .lhson_baogia_add .form-group > label,
+    .quote-edit-workspace .lhson_baogia_add .form-group > .control-label {
+        color: #475569;
+        display: block;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+    .quote-edit-workspace .lhson_baogia_add .form-control,
+    .quote-edit-workspace .lhson_baogia_add .select2-choice {
+        border-color: #dbeafe;
+        border-radius: 10px !important;
+        min-height: 36px;
+    }
+    .quote-edit-workspace #construction_address,
+    .quote-edit-workspace #qunote {
+        min-height: 78px;
+        resize: vertical;
+    }
+    .quote-edit-workspace #bottom-total {
+        background: linear-gradient(135deg, #fff 0%, #f5f3ff 100%);
+        border: 1px solid #e9d5ff;
+        border-radius: 16px;
+        bottom: 0;
+        box-shadow: 0 -10px 28px rgba(99, 102, 241, .1);
+        margin-top: 14px;
+        position: sticky;
+        z-index: 50;
+    }
+    .quote-edit-workspace #bottom-total .table {
+        background: transparent;
+    }
+    .quote-edit-workspace #bottom-total td {
+        border-color: #e9d5ff;
+        color: #312e81;
+        font-weight: 900;
+    }
+    @media (max-width: 1199px) {
+        .quote-editor-main {
+            display: block;
+        }
+        .quote-info-panel {
+            max-height: none;
+            position: static;
+            width: 100%;
+        }
+        .quote-helper-strip {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    @media (max-width: 767px) {
+        .quote-edit-workspace > .box-header {
+            align-items: flex-start;
+            display: block;
+            position: static;
+        }
+        .quote-edit-workspace .main-task-lhson {
+            margin-top: 10px;
+        }
+        .quote-helper-strip {
+            grid-template-columns: 1fr;
+        }
+        .quote-edit-workspace .lhson_baogia_add > .col-md-4,
+        .quote-edit-workspace .lhson_baogia_add > .row > .col-sm-12 {
+            width: 100%;
+        }
+    }
+</style>
 
-<div class="box">
+<div class="box quote-edit-workspace">
     <?php
     $attrib = array('data-toggle' => 'validator', 'role' => 'form', 'class' => 'edit-qu-form');
     echo form_open_multipart("quotes/edit/" . $id, $attrib)
@@ -337,11 +582,18 @@ $('#saveCustomOptions').click(function(e) {
         </div>
     </div>
     <div class="box-content baogia_lhson">
+        <div class="quote-helper-strip">
+            <div class="quote-helper-item"><i class="fa fa-user"></i> 1. Chọn khách/kho</div>
+            <div class="quote-helper-item"><i class="fa fa-search"></i> 2. Tìm & thêm sản phẩm</div>
+            <div class="quote-helper-item"><i class="fa fa-calendar"></i> 3. Kiểm ngày giao/cọc</div>
+            <div class="quote-helper-item"><i class="fa fa-save"></i> 4. Lưu báo giá</div>
+        </div>
         <div class="row">
             <div class="col-lg-12">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="col-md-8">
+                        <div class="quote-editor-main">
+                        <div class="quote-products-panel">
                             <div class="col-md-12" id="sticker">
                                 <div class="input-group wide-tip">
                                     <?php echo form_input('add_item', '', 'class="form-control input-lg" id="add_item" placeholder="' . $this->lang->line("add_product_to_order") . '"'); ?>
@@ -389,7 +641,8 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
 
                             <input type="hidden" name="total_items" value="" id="total_items" required="required" />
                         </div>
-                        <div class="col-md-4 lhson_baogia_add">
+                        <div class="quote-info-panel">
+                        <div class="lhson_baogia_add">
 
                             <?php if ($Owner || $Admin || !$this->session->userdata('warehouse_id')) { ?>
                                 <div class="col-md-4">
@@ -579,6 +832,8 @@ echo form_dropdown('status', $st, 'Đang báo giá', 'class="form-control input-
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        </div>
                         </div>
                     </div>
                 </div>
