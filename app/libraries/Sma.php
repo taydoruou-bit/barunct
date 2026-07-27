@@ -347,24 +347,49 @@ class Sma
     public function qrcode($type = 'text', $text = 'http://scodeweb.com', $size = 2, $level = 'H', $sq = null)
     {
         $file_name = 'assets/uploads/qrcode' . $this->session->userdata('user_id') . ($sq ? $sq : '') . ($this->Settings->barcode_img ? '.png' : '.svg');
-		if (is_readable($file_name) && unlink($file_name)) {
-		
-		}
         if ($type == 'link') {
             $text = urldecode($text);
         }
-        $this->load->library('phpqrcode');
-        $config = array('data' => $text, 'size' => $size, 'level' => $level, 'savename' => $file_name);
-        if (!$this->Settings->barcode_img) {
-            $config['svg'] = 1;
-        }
-        $this->phpqrcode->generate($config);
-        if ($this->Settings->barcode_img) {
+
+        $error_reporting = error_reporting();
+        $buffer_level = ob_get_level();
+        ob_start();
+
+        try {
+            error_reporting($error_reporting & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+            if (is_readable($file_name)) {
+                @unlink($file_name);
+            }
+            $this->load->library('phpqrcode');
+            $config = array('data' => $text, 'size' => $size, 'level' => $level, 'savename' => $file_name);
+            if (!$this->Settings->barcode_img) {
+                $config['svg'] = 1;
+            }
+            $this->phpqrcode->generate($config);
+            while (ob_get_level() > $buffer_level) {
+                ob_end_clean();
+            }
+            if (!is_readable($file_name)) {
+                return '';
+            }
             $imagedata = file_get_contents($file_name);
-            return "<img src='data:image/png;base64,".base64_encode($imagedata)."' alt='{$text}' class='qrimg' style='float:right;' />";
+            if ($imagedata === false) {
+                return '';
+            }
+            $alt = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+            if ($this->Settings->barcode_img) {
+                return "<img src='data:image/png;base64,".base64_encode($imagedata)."' alt='{$alt}' class='qrimg' style='float:right;' />";
+            }
+            return "<img src='data:image/svg+xml;base64,".base64_encode($imagedata)."' alt='{$alt}' class='qrimg' style='float:right;' />";
+        } catch (Throwable $e) {
+            while (ob_get_level() > $buffer_level) {
+                ob_end_clean();
+            }
+            log_message('error', 'QR code generation failed: ' . $e->getMessage());
+            return '';
+        } finally {
+            error_reporting($error_reporting);
         }
-        $imagedata = file_get_contents($file_name);
-        return "<img src='data:image/svg+xml;base64,".base64_encode($imagedata)."' alt='{$text}' class='qrimg' style='float:right;' />";
     }
 
     public function generate_pdf($content, $name = 'download.pdf', $output_type = null, $footer = null, $margin_bottom = null, $header = null, $margin_top = null, $orientation = 'P')
