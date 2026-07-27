@@ -458,3 +458,20 @@
 .misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu > li.active > a > i {
     color: #4f46e5;
 }
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li.mm_reports > .submenu,
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li.mm_system_settings > .submenu {
+    bottom: 0 !important;
+    max-height: 78vh;
+    top: auto !important;
+}
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li.mm_reports > .submenu {
+    width: 320px !important;
+}
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li.mm_reports > .submenu:after,
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li.mm_system_settings > .submenu:after {
+    bottom: 18px;
+    top: auto;
+}
