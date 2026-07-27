@@ -53,15 +53,15 @@
 }
 
 .misa-erp-shell #sidebar.menu-lhson {
-    background: #fff !important;
-    border-right: 1px solid #e6edf5;
-    box-shadow: 8px 0 24px rgba(15, 23, 42, .05);
+    background: #101828 !important;
+    border-right: 1px solid #0b1220;
+    box-shadow: 8px 0 24px rgba(2, 6, 23, .22);
     padding-top: 12px;
 }
 
 .misa-erp-shell #sidebar:before {
-    background: #fff !important;
-    border-right: 1px solid #e6edf5;
+    background: #101828 !important;
+    border-right: 1px solid #0b1220;
 }
 
 .misa-erp-shell .nav-list {
@@ -88,7 +88,7 @@
     align-items: center;
     background: transparent !important;
     border-radius: 12px;
-    color: #334155;
+    color: #f8fafc;
     display: flex;
     font-size: 13px;
     font-weight: 700;
@@ -101,40 +101,40 @@
 .misa-erp-shell .nav-list > li > a:hover,
 .misa-erp-shell .nav-list > li.hover > a,
 .misa-erp-shell .nav-list > li.open > a {
-    background: #eef8f7 !important;
-    color: #0f766e !important;
+    background: #1f2937 !important;
+    color: #fff !important;
 }
 
 .misa-erp-shell .nav-list > li.active > a,
 .misa-erp-shell .nav-list > li.mm_pos > a,
 .misa-erp-shell .nav-list > li.open.active > a {
-    background: linear-gradient(135deg, #e6fffa, #eef6ff) !important;
-    color: #0f766e !important;
-    box-shadow: inset 4px 0 0 #0f766e;
+    background: #fff !important;
+    color: #0f172a !important;
+    box-shadow: inset 4px 0 0 #0ea5e9, 0 8px 18px rgba(2, 6, 23, .2);
 }
 
 .misa-erp-shell .nav-list > li.mm_pos_lhson > a {
-    background: linear-gradient(135deg, #0f766e, #0ea5e9) !important;
+    background: #fff !important;
     border: 0 !important;
     border-radius: 14px;
-    box-shadow: 0 10px 22px rgba(14, 165, 233, .22);
-    color: #fff !important;
+    box-shadow: 0 12px 24px rgba(2, 6, 23, .28);
+    color: #0f172a !important;
     font-weight: 800;
     justify-content: flex-start;
     margin-bottom: 10px;
 }
 
 .misa-erp-shell .nav-list > li.mm_pos_lhson > a:hover {
-    background: linear-gradient(135deg, #0d9488, #0284c7) !important;
-    color: #fff !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
     transform: translateY(-1px);
 }
 
 .misa-erp-shell .nav-list > li > a > .menu-icon,
 .misa-erp-shell .nav-list > li > a > i:first-child {
-    background: #f1f5f9;
+    background: #fff;
     border-radius: 10px;
-    color: #0f766e;
+    color: #0f172a;
     flex: 0 0 30px;
     font-size: 15px;
     height: 30px;
@@ -145,7 +145,7 @@
 }
 
 .misa-erp-shell .nav-list > li.mm_pos_lhson > a > i:first-child {
-    background: rgba(255, 255, 255, .18);
+    background: #0f172a;
     color: #fff;
 }
 
@@ -161,7 +161,7 @@
 
 .misa-erp-shell .nav-list > li > a > .arrow,
 .misa-erp-shell .nav-list > li > a > b.arrow {
-    color: #94a3b8;
+    color: #cbd5e1;
     font-size: 13px;
     margin-left: auto;
     position: static;
@@ -169,7 +169,7 @@
 
 .misa-erp-shell .nav-list > li.open > a > .arrow,
 .misa-erp-shell .nav-list > li.open > a > b.arrow {
-    color: #0f766e;
+    color: #fff;
     transform: rotate(90deg);
 }
 
@@ -183,7 +183,7 @@
 }
 
 .misa-erp-shell .nav-list > li .submenu:before {
-    background: #dbe7f1;
+    background: #334155;
     content: "";
     height: calc(100% - 10px);
     left: 0;
@@ -201,7 +201,7 @@
     background: transparent !important;
     border: 0 !important;
     border-radius: 10px;
-    color: #64748b;
+    color: #dbe4ee;
     font-size: 12px;
     font-weight: 600;
     line-height: 32px;
@@ -211,12 +211,12 @@
 
 .misa-erp-shell .nav-list > li .submenu > li > a:hover,
 .misa-erp-shell .nav-list > li .submenu > li.active > a {
-    background: #f1f8ff !important;
-    color: #0f766e !important;
+    background: #fff !important;
+    color: #0f172a !important;
 }
 
 .misa-erp-shell .nav-list > li .submenu > li > a > i {
-    color: #94a3b8;
+    color: #cbd5e1;
     font-size: 12px;
     margin-right: 8px;
     width: 16px;
@@ -224,7 +224,7 @@
 
 .misa-erp-shell .nav-list > li .submenu > li > a:hover > i,
 .misa-erp-shell .nav-list > li .submenu > li.active > a > i {
-    color: #0f766e;
+    color: #0f172a;
 }
 
 .misa-erp-shell .main-content {
