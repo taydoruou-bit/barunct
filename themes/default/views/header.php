@@ -21,6 +21,7 @@
 	  	<link rel="stylesheet" href="<?= $assets ?>ace/css/ace-skins.min.css" />
 		<link rel="stylesheet" href="<?= $assets ?>ace/css/ace-rtl.min.css" />
 	  <link href="<?= $assets ?>ace/css/ace.min.css" rel="stylesheet">
+	  <link href="<?= $assets ?>styles/misa-sidebar.css?v=20260727" rel="stylesheet">
 		<script type="text/javascript">
 			$(window).load(function () {
 				$("#loading").fadeOut("slow");
@@ -92,7 +93,7 @@
 	</style>
 </head>
 
-<body class="no-skin">
+<body class="no-skin misa-erp-shell">
 
 <div id="loading" class="no-print"></div>
 	<div id="navbar" class="navbar navbar-default          ace-save-state">

@@ -1,0 +1,275 @@
+/* MISA ERP-inspired left navigation */
+.misa-erp-shell {
+    background: #f3f7fb;
+    color: #172b4d;
+}
+
+.misa-erp-shell #navbar.navbar {
+    background: #fff !important;
+    border: 0;
+    border-bottom: 1px solid #e5edf5;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, .06);
+    min-height: 56px;
+}
+
+.misa-erp-shell .navbar .navbar-brand,
+.misa-erp-shell .navbar .navbar-brand:hover,
+.misa-erp-shell .navbar .navbar-brand:focus {
+    color: #0f766e;
+    height: 56px;
+    line-height: 54px;
+    padding: 0 18px;
+}
+
+.misa-erp-shell .navbar .navbar-brand small {
+    color: #0f766e;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: .01em;
+}
+
+.misa-erp-shell .navbar .navbar-brand i {
+    background: linear-gradient(135deg, #12b886, #0ea5e9);
+    border-radius: 10px;
+    color: #fff;
+    height: 32px;
+    line-height: 32px;
+    margin-right: 8px;
+    text-align: center;
+    width: 32px;
+}
+
+.misa-erp-shell .navbar .ace-nav > li {
+    border-left: 1px solid #edf2f7;
+}
+
+.misa-erp-shell .navbar .ace-nav > li > a,
+.misa-erp-shell .navbar .ace-nav > li > a:hover,
+.misa-erp-shell .navbar .ace-nav > li > a:focus {
+    background: transparent !important;
+    color: #475569 !important;
+    height: 56px;
+    line-height: 56px;
+}
+
+.misa-erp-shell #sidebar.menu-lhson {
+    background: #fff !important;
+    border-right: 1px solid #e6edf5;
+    box-shadow: 8px 0 24px rgba(15, 23, 42, .05);
+    padding-top: 12px;
+}
+
+.misa-erp-shell #sidebar:before {
+    background: #fff !important;
+    border-right: 1px solid #e6edf5;
+}
+
+.misa-erp-shell .nav-list {
+    padding: 0 10px 18px;
+}
+
+.misa-erp-shell .nav-list > li {
+    background: transparent;
+    border: 0 !important;
+    margin: 3px 0;
+}
+
+.misa-erp-shell .nav-list > li:before,
+.misa-erp-shell .nav-list > li:after,
+.misa-erp-shell .nav-list > li > a:before,
+.misa-erp-shell .nav-list > li > a:after {
+    display: none !important;
+}
+
+.misa-erp-shell .nav-list > li > a,
+.misa-erp-shell .nav-list > li > a.dropdown-toggle,
+.misa-erp-shell .nav-list > li > a.dropmenu,
+.misa-erp-shell .nav-list > li > a.dropdown-s {
+    align-items: center;
+    background: transparent !important;
+    border-radius: 12px;
+    color: #334155;
+    display: flex;
+    font-size: 13px;
+    font-weight: 700;
+    height: 42px;
+    line-height: 42px;
+    padding: 0 12px;
+    transition: all .16s ease;
+}
+
+.misa-erp-shell .nav-list > li > a:hover,
+.misa-erp-shell .nav-list > li.hover > a,
+.misa-erp-shell .nav-list > li.open > a {
+    background: #eef8f7 !important;
+    color: #0f766e !important;
+}
+
+.misa-erp-shell .nav-list > li.active > a,
+.misa-erp-shell .nav-list > li.mm_pos > a,
+.misa-erp-shell .nav-list > li.open.active > a {
+    background: linear-gradient(135deg, #e6fffa, #eef6ff) !important;
+    color: #0f766e !important;
+    box-shadow: inset 4px 0 0 #0f766e;
+}
+
+.misa-erp-shell .nav-list > li.mm_pos_lhson > a {
+    background: linear-gradient(135deg, #0f766e, #0ea5e9) !important;
+    border: 0 !important;
+    border-radius: 14px;
+    box-shadow: 0 10px 22px rgba(14, 165, 233, .22);
+    color: #fff !important;
+    font-weight: 800;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.misa-erp-shell .nav-list > li.mm_pos_lhson > a:hover {
+    background: linear-gradient(135deg, #0d9488, #0284c7) !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+.misa-erp-shell .nav-list > li > a > .menu-icon,
+.misa-erp-shell .nav-list > li > a > i:first-child {
+    background: #f1f5f9;
+    border-radius: 10px;
+    color: #0f766e;
+    flex: 0 0 30px;
+    font-size: 15px;
+    height: 30px;
+    line-height: 30px;
+    margin-right: 10px;
+    text-align: center;
+    width: 30px;
+}
+
+.misa-erp-shell .nav-list > li.mm_pos_lhson > a > i:first-child {
+    background: rgba(255, 255, 255, .18);
+    color: #fff;
+}
+
+.misa-erp-shell .nav-list > li > a .menu-text,
+.misa-erp-shell .nav-list > li > a .text,
+.misa-erp-shell .nav-list > li > a .padding05 {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.misa-erp-shell .nav-list > li > a > .arrow,
+.misa-erp-shell .nav-list > li > a > b.arrow {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-left: auto;
+    position: static;
+}
+
+.misa-erp-shell .nav-list > li.open > a > .arrow,
+.misa-erp-shell .nav-list > li.open > a > b.arrow {
+    color: #0f766e;
+    transform: rotate(90deg);
+}
+
+.misa-erp-shell .nav-list > li .submenu {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    margin: 4px 0 6px 42px;
+    padding: 3px 0 3px 10px;
+    position: relative;
+}
+
+.misa-erp-shell .nav-list > li .submenu:before {
+    background: #dbe7f1;
+    content: "";
+    height: calc(100% - 10px);
+    left: 0;
+    position: absolute;
+    top: 5px;
+    width: 1px;
+}
+
+.misa-erp-shell .nav-list > li .submenu > li {
+    border: 0 !important;
+    margin: 2px 0;
+}
+
+.misa-erp-shell .nav-list > li .submenu > li > a {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 10px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 32px;
+    min-height: 32px;
+    padding: 0 10px !important;
+}
+
+.misa-erp-shell .nav-list > li .submenu > li > a:hover,
+.misa-erp-shell .nav-list > li .submenu > li.active > a {
+    background: #f1f8ff !important;
+    color: #0f766e !important;
+}
+
+.misa-erp-shell .nav-list > li .submenu > li > a > i {
+    color: #94a3b8;
+    font-size: 12px;
+    margin-right: 8px;
+    width: 16px;
+}
+
+.misa-erp-shell .nav-list > li .submenu > li > a:hover > i,
+.misa-erp-shell .nav-list > li .submenu > li.active > a > i {
+    color: #0f766e;
+}
+
+.misa-erp-shell .main-content {
+    background: #f3f7fb;
+}
+
+.misa-erp-shell .breadcrumbs {
+    background: transparent;
+    border: 0;
+}
+
+.misa-erp-shell .box {
+    border: 1px solid #e8eef5;
+    border-radius: 16px;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, .05);
+    overflow: hidden;
+}
+
+.misa-erp-shell .box .box-header {
+    background: #fff;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.misa-erp-shell .box .box-header h2 {
+    color: #0f766e;
+    font-weight: 800;
+}
+
+.misa-erp-shell.sidebar-collapse .nav-list {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.misa-erp-shell.sidebar-collapse .nav-list > li > a {
+    justify-content: center;
+    padding: 0;
+}
+
+.misa-erp-shell.sidebar-collapse .nav-list > li > a > .menu-icon,
+.misa-erp-shell.sidebar-collapse .nav-list > li > a > i:first-child {
+    margin-right: 0;
+}
+
+@media only screen and (max-width: 991px) {
+    .misa-erp-shell #sidebar.menu-lhson {
+        box-shadow: 8px 0 28px rgba(15, 23, 42, .14);
+    }
+}
