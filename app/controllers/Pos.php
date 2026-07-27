@@ -632,14 +632,16 @@ class Pos extends MY_Controller
             } 
             //tien hanh lay danh sach khuyen mai theo san pham neu co 
             $khuyenmai_main=$this->getKhuyenmainewsByNow();
+            $khuyenmai_main = is_array($khuyenmai_main) ? $khuyenmai_main : array();
             $main_product=array();
-            if(count($khuyenmai_main)>0){               
+            if(!empty($khuyenmai_main)){               
                 foreach($khuyenmai_main as $main_pr){
                     $main_product[]=$main_pr->main_product_id;
                 }               
             }
             $this->data['khuyenmai_main'] = $khuyenmai_main;
-            $khuyenmai_product=$this->getKhuyenmainewsProductByNow();           
+            $khuyenmai_product=$this->getKhuyenmainewsProductByNow();
+            $khuyenmai_product = is_array($khuyenmai_product) ? $khuyenmai_product : array();
 
             $this->data['sub_product'] = $khuyenmai_product;
             $this->data['main_product'] = $main_product;

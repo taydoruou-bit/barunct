@@ -51,6 +51,7 @@ class Sma
 
     public function formatMoney($number)
     {
+        $number = is_numeric($number) ? $number : 0;
         if ($this->Settings->sac) {
             return ($this->Settings->display_symbol == 1 ? $this->Settings->symbol : '') .
             $this->formatSAC($this->formatDecimal($number)) .
@@ -66,6 +67,7 @@ class Sma
 
     public function formatQuantity($number, $decimals = null)
     {
+        $number = is_numeric($number) ? $number : 0;
         if (!$decimals) {
             $decimals = $this->Settings->qty_decimals;
         }
@@ -79,6 +81,7 @@ class Sma
 
     public function formatNumber($number, $decimals = null)
     {
+        $number = is_numeric($number) ? $number : 0;
         if (!$decimals) {
             $decimals = $this->Settings->decimals;
         }
