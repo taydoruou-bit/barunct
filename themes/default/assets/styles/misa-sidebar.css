@@ -355,12 +355,12 @@
 }
 
 .misa-erp-shell .metric-card {
-    min-height: 118px;
-    padding: 15px;
+    min-height: 104px;
+    padding: 14px 12px;
 }
 
 .misa-erp-shell .metric-value {
-    font-size: 19px;
+    font-size: 17px;
 }
 
 /* Level-2 flyout menu */

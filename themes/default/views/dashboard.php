@@ -95,7 +95,7 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
     .metric-card {
         margin-top: 16px;
         min-height: 104px;
-        padding: 14px;
+        padding: 14px 12px;
         position: relative;
         transition: transform .18s ease, box-shadow .18s ease;
     }
@@ -105,16 +105,16 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
     }
     .metric-icon {
         align-items: center;
-        border-radius: 11px;
+        border-radius: 10px;
         color: #fff;
         display: flex;
-        font-size: 15px;
-        height: 32px;
+        font-size: 13px;
+        height: 28px;
         justify-content: center;
         position: absolute;
-        right: 14px;
-        top: 14px;
-        width: 32px;
+        right: 10px;
+        top: 10px;
+        width: 28px;
     }
     .metric-label {
         color: #64748b;
@@ -122,14 +122,17 @@ $can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
         font-weight: 800;
         letter-spacing: .08em;
         margin-bottom: 8px;
+        min-height: 30px;
+        padding-right: 34px;
         text-transform: uppercase;
     }
     .metric-value {
         color: #0f172a;
-        font-size: 18px;
+        font-size: 17px;
         font-weight: 900;
         line-height: 1.1;
-        padding-right: 38px;
+        padding-right: 0;
+        word-break: break-word;
     }
     .metric-sub {
         color: #64748b;

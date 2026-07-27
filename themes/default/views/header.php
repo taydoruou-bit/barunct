@@ -21,7 +21,7 @@
 	  	<link rel="stylesheet" href="<?= $assets ?>ace/css/ace-skins.min.css" />
 		<link rel="stylesheet" href="<?= $assets ?>ace/css/ace-rtl.min.css" />
 	  <link href="<?= $assets ?>ace/css/ace.min.css" rel="stylesheet">
-	  <link href="<?= $assets ?>styles/misa-sidebar.css?v=20260728a" rel="stylesheet">
+	  <link href="<?= $assets ?>styles/misa-sidebar.css?v=20260728b" rel="stylesheet">
 		<script type="text/javascript">
 			$(window).load(function () {
 				$("#loading").fadeOut("slow");
