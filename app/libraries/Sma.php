@@ -394,64 +394,77 @@ class Sma
 
     public function generate_pdf($content, $name = 'download.pdf', $output_type = null, $footer = null, $margin_bottom = null, $header = null, $margin_top = null, $orientation = 'P')
     {
-        if (!$output_type) {
-            $output_type = 'D';
-        }
-        if (!$margin_bottom) {
-            $margin_bottom = 10;
-        }
-        if (!$margin_top) {
-            $margin_top = 20;
-        }
-        $this->load->library('pdf');
-        $pdf = new mPDF('utf-8', 'A4-' . $orientation, '13', '', 10, 10, $margin_top, $margin_bottom, 9, 9);
-        $pdf->debug = false;
-        $pdf->autoScriptToLang = true;
-        $pdf->autoLangToFont = true;
-        // if you need to add protection to pdf files, please uncomment the line below or modify as you need.
-        // $pdf->SetProtection(array('print')); // You pass 2nd arg for user password (open) and 3rd for owner password (edit)
-        // $pdf->SetProtection(array('print', 'copy')); // Comment above line and uncomment this to allow copying of content
-        $pdf->SetTitle($this->Settings->site_name);
-        $pdf->SetAuthor($this->Settings->site_name);
-        $pdf->SetCreator($this->Settings->site_name);
-        $pdf->SetDisplayMode('fullpage');
-        $stylesheet = file_get_contents('assets/bs/bootstrap.min.css');
-        $pdf->WriteHTML($stylesheet, 1);
-        // $pdf->SetFooter($this->Settings->site_name.'||{PAGENO}/{nbpg}', '', TRUE); // For simple text footer
+        $error_reporting = error_reporting();
+        error_reporting($error_reporting & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_WARNING & ~E_NOTICE & ~E_STRICT);
 
-        if (is_array($content)) {
-            $pdf->SetHeader($this->Settings->site_name.'||{PAGENO}/{nbpg}', '', TRUE); // For simple text header
-            $as = sizeof($content);
-            $r = 1;
-            foreach ($content as $page) {
-                $pdf->WriteHTML($page['content']);
-                if (!empty($page['footer'])) {
-                    $pdf->SetHTMLFooter('<p class="text-center">' . $page['footer'] . '</p>', '', true);
+        try {
+            if (!$output_type) {
+                $output_type = 'D';
+            }
+            if (!$margin_bottom) {
+                $margin_bottom = 10;
+            }
+            if (!$margin_top) {
+                $margin_top = 20;
+            }
+            $this->load->library('pdf');
+            $pdf = new mPDF('utf-8', 'A4-' . $orientation, '13', '', 10, 10, $margin_top, $margin_bottom, 9, 9);
+            $pdf->debug = false;
+            $pdf->autoScriptToLang = true;
+            $pdf->autoLangToFont = true;
+            // if you need to add protection to pdf files, please uncomment the line below or modify as you need.
+            // $pdf->SetProtection(array('print')); // You pass 2nd arg for user password (open) and 3rd for owner password (edit)
+            // $pdf->SetProtection(array('print', 'copy')); // Comment above line and uncomment this to allow copying of content
+            $pdf->SetTitle($this->Settings->site_name);
+            $pdf->SetAuthor($this->Settings->site_name);
+            $pdf->SetCreator($this->Settings->site_name);
+            $pdf->SetDisplayMode('fullpage');
+            $stylesheet = file_get_contents('assets/bs/bootstrap.min.css');
+            $pdf->WriteHTML($stylesheet, 1);
+            // $pdf->SetFooter($this->Settings->site_name.'||{PAGENO}/{nbpg}', '', TRUE); // For simple text footer
+
+            if (is_array($content)) {
+                $pdf->SetHeader($this->Settings->site_name.'||{PAGENO}/{nbpg}', '', TRUE); // For simple text header
+                $as = sizeof($content);
+                $r = 1;
+                foreach ($content as $page) {
+                    $pdf->WriteHTML($page['content']);
+                    if (!empty($page['footer'])) {
+                        $pdf->SetHTMLFooter('<p class="text-center">' . $page['footer'] . '</p>', '', true);
+                    }
+                    if ($as != $r) {
+                        $pdf->AddPage();
+                    }
+                    $r++;
                 }
-                if ($as != $r) {
-                    $pdf->AddPage();
+
+            } else {
+
+                $pdf->WriteHTML($content);
+                if ($header != '') {
+                    $pdf->SetHTMLHeader('<p class="text-center">' . $header . '</p>', '', true);
                 }
-                $r++;
+                if ($footer != '') {
+                    $pdf->SetHTMLFooter('<p class="text-center">' . $footer . '</p>', '', true);
+                }
+
             }
 
-        } else {
-
-            $pdf->WriteHTML($content);
-            if ($header != '') {
-                $pdf->SetHTMLHeader('<p class="text-center">' . $header . '</p>', '', true);
+            if ($output_type == 'S') {
+                $file_content = $pdf->Output('', 'S');
+                write_file('assets/uploads/' . $name, $file_content);
+                return 'assets/uploads/' . $name;
+            } else {
+                $pdf->Output($name, $output_type);
             }
-            if ($footer != '') {
-                $pdf->SetHTMLFooter('<p class="text-center">' . $footer . '</p>', '', true);
+        } catch (Throwable $e) {
+            log_message('error', 'PDF generation failed: ' . $e->getMessage());
+            if ($output_type == 'S') {
+                return false;
             }
-
-        }
-
-        if ($output_type == 'S') {
-            $file_content = $pdf->Output('', 'S');
-            write_file('assets/uploads/' . $name, $file_content);
-            return 'assets/uploads/' . $name;
-        } else {
-            $pdf->Output($name, $output_type);
+            show_error('Không thể tạo file PDF. Vui lòng thử lại hoặc liên hệ kỹ thuật.', 500);
+        } finally {
+            error_reporting($error_reporting);
         }
     }
 
