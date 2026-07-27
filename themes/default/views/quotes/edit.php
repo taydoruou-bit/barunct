@@ -447,7 +447,7 @@ $('#saveCustomOptions').click(function(e) {
     .quote-edit-workspace #quTable {
         table-layout: fixed;
         margin-bottom: 0;
-        min-width: 860px;
+        min-width: 890px;
     }
     .quote-edit-workspace #quTable thead th {
         background: #d8fbf7;
@@ -478,7 +478,7 @@ $('#saveCustomOptions').click(function(e) {
     }
     .quote-edit-workspace #quTable th:nth-child(6),
     .quote-edit-workspace #quTable td:nth-child(6) {
-        width: 64px;
+        width: 86px;
     }
     .quote-edit-workspace #quTable th:nth-child(7),
     .quote-edit-workspace #quTable td:nth-child(7) {
