@@ -31,6 +31,7 @@ class Welcome extends MY_Controller
         $this->data['suppliers'] = $this->db_model->getLatestSuppliers();
         $this->data['chatData'] = $this->db_model->getChartData();
         $this->data['stock'] = $this->db_model->getStockValue();
+        $this->data['dashboard_summary'] = $this->db_model->getDashboardSummary();
         $this->data['bs'] = $this->db_model->getBestSeller();
         $lmsdate = date('Y-m-d', strtotime('first day of last month')) . ' 00:00:00';
         $lmedate = date('Y-m-d', strtotime('last day of last month')) . ' 23:59:59';

@@ -17,10 +17,324 @@ function row_status($x)
     }
 }
 
+$summary = isset($dashboard_summary) && $dashboard_summary ? $dashboard_summary : (object) array();
+$sales_today_total = isset($summary->sales_today_total) ? $summary->sales_today_total : 0;
+$sales_month_total = isset($summary->sales_month_total) ? $summary->sales_month_total : 0;
+$sales_month_paid = isset($summary->sales_month_paid) ? $summary->sales_month_paid : 0;
+$quotes_month_total = isset($summary->quotes_month_total) ? $summary->quotes_month_total : 0;
+$purchases_month_total = isset($summary->purchases_month_total) ? $summary->purchases_month_total : 0;
+$collection_rate = $sales_month_total > 0 ? round(($sales_month_paid / $sales_month_total) * 100) : 0;
+$can_products = $Owner || $Admin || !empty($GP['products-index']);
+$can_sales = $Owner || $Admin || !empty($GP['sales-index']);
+$can_quotes = $Owner || $Admin || !empty($GP['quotes-index']);
+$can_purchases = $Owner || $Admin || !empty($GP['purchases-index']);
+$can_transfers = $Owner || $Admin || !empty($GP['transfers-index']);
+$can_customers = $Owner || $Admin || !empty($GP['customers-index']);
+$can_suppliers = $Owner || $Admin || !empty($GP['suppliers-index']);
 ?>
 
+<style>
+    .dashboard-modern {
+        margin-bottom: 20px;
+    }
+    .dashboard-hero {
+        background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 52%, #2563eb 100%);
+        border-radius: 22px;
+        color: #fff;
+        padding: 26px 28px;
+        box-shadow: 0 18px 45px rgba(15, 118, 110, .22);
+        overflow: hidden;
+        position: relative;
+    }
+    .dashboard-hero:after {
+        background: rgba(255, 255, 255, .12);
+        border-radius: 50%;
+        content: "";
+        height: 260px;
+        position: absolute;
+        right: -70px;
+        top: -100px;
+        width: 260px;
+    }
+    .dashboard-hero h1 {
+        color: #fff;
+        font-size: 28px;
+        font-weight: 800;
+        margin: 0 0 8px;
+    }
+    .dashboard-hero p {
+        color: rgba(255, 255, 255, .86);
+        font-size: 14px;
+        margin: 0;
+    }
+    .dashboard-hero-actions {
+        margin-top: 18px;
+    }
+    .dashboard-hero-actions .btn {
+        border: 0;
+        border-radius: 999px;
+        font-weight: 700;
+        margin: 0 8px 8px 0;
+        padding: 10px 16px;
+    }
+    .metric-card, .modern-panel, .modern-action {
+        background: #fff;
+        border: 1px solid #e8eef5;
+        border-radius: 18px;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+    }
+    .metric-card {
+        margin-top: 16px;
+        min-height: 132px;
+        padding: 18px;
+        position: relative;
+    }
+    .metric-icon {
+        align-items: center;
+        border-radius: 16px;
+        color: #fff;
+        display: flex;
+        font-size: 22px;
+        height: 46px;
+        justify-content: center;
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        width: 46px;
+    }
+    .metric-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+    }
+    .metric-value {
+        color: #0f172a;
+        font-size: 21px;
+        font-weight: 900;
+        line-height: 1.1;
+        padding-right: 54px;
+    }
+    .metric-sub {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+    .bg-teal { background: linear-gradient(135deg, #14b8a6, #0f766e); }
+    .bg-blue { background: linear-gradient(135deg, #38bdf8, #2563eb); }
+    .bg-orange { background: linear-gradient(135deg, #fb923c, #ea580c); }
+    .bg-red { background: linear-gradient(135deg, #fb7185, #e11d48); }
+    .modern-panel {
+        margin-top: 16px;
+        padding: 18px;
+    }
+    .modern-panel-title {
+        color: #0f172a;
+        font-size: 16px;
+        font-weight: 900;
+        margin-bottom: 14px;
+    }
+    .modern-actions-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+    .modern-action {
+        color: #0f172a;
+        display: block;
+        font-weight: 800;
+        padding: 14px;
+        text-decoration: none;
+        transition: all .18s ease;
+    }
+    .modern-action:hover {
+        color: #2563eb;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    .modern-action i {
+        color: #2563eb;
+        font-size: 22px;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .activity-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .activity-list li {
+        border-bottom: 1px solid #eef2f7;
+        display: flex;
+        gap: 12px;
+        padding: 11px 0;
+    }
+    .activity-list li:last-child {
+        border-bottom: 0;
+    }
+    .activity-dot {
+        border-radius: 50%;
+        flex: 0 0 10px;
+        height: 10px;
+        margin-top: 7px;
+        width: 10px;
+    }
+    .activity-main {
+        flex: 1;
+        min-width: 0;
+    }
+    .activity-title {
+        color: #0f172a;
+        font-weight: 800;
+    }
+    .activity-meta {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+    @media (max-width: 767px) {
+        .dashboard-hero {
+            padding: 22px 18px;
+        }
+        .dashboard-hero h1 {
+            font-size: 23px;
+        }
+    }
+</style>
+
+<div class="dashboard-modern">
+    <div class="dashboard-hero">
+        <div class="row">
+            <div class="col-sm-8">
+                <h1>Chào <?= $this->session->userdata('first_name') ? $this->session->userdata('first_name') : 'Barun Door'; ?> 👋</h1>
+                <p>Tổng quan nhanh hoạt động bán hàng, báo giá, thu tiền và tồn kho trong tháng <?= date('m/Y'); ?>.</p>
+                <div class="dashboard-hero-actions">
+                    <?php if ($can_quotes) { ?><a href="<?= site_url('quotes/add') ?>" class="btn btn-default"><i class="fa fa-plus"></i> Tạo báo giá</a><?php } ?>
+                    <?php if ($can_sales) { ?><a href="<?= site_url('sales') ?>" class="btn btn-default"><i class="fa fa-shopping-cart"></i> Xem đơn hàng</a><?php } ?>
+                    <?php if ($can_products) { ?><a href="<?= site_url('products') ?>" class="btn btn-default"><i class="fa fa-cubes"></i> Sản phẩm</a><?php } ?>
+                </div>
+            </div>
+            <div class="col-sm-4 text-right hidden-xs">
+                <div style="font-size:13px;color:rgba(255,255,255,.78);font-weight:700;">Hôm nay</div>
+                <div style="font-size:34px;font-weight:900;"><?= date('d/m/Y'); ?></div>
+                <div style="font-size:13px;color:rgba(255,255,255,.78);">Cập nhật dữ liệu realtime từ hệ thống</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="metric-card">
+                <div class="metric-icon bg-teal"><i class="fa fa-line-chart"></i></div>
+                <div class="metric-label">Doanh số hôm nay</div>
+                <div class="metric-value"><?= $this->sma->formatMoney($sales_today_total); ?></div>
+                <div class="metric-sub"><?= isset($summary->sales_today_count) ? (int) $summary->sales_today_count : 0; ?> đơn phát sinh</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="metric-card">
+                <div class="metric-icon bg-blue"><i class="fa fa-calendar-check-o"></i></div>
+                <div class="metric-label">Doanh số tháng</div>
+                <div class="metric-value"><?= $this->sma->formatMoney($sales_month_total); ?></div>
+                <div class="metric-sub"><?= isset($summary->sales_month_count) ? (int) $summary->sales_month_count : 0; ?> đơn trong tháng</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="metric-card">
+                <div class="metric-icon bg-teal"><i class="fa fa-credit-card"></i></div>
+                <div class="metric-label">Đã thu tháng</div>
+                <div class="metric-value"><?= $this->sma->formatMoney($sales_month_paid); ?></div>
+                <div class="metric-sub">Tỷ lệ thu <?= $collection_rate; ?>%</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="metric-card">
+                <div class="metric-icon bg-orange"><i class="fa fa-file-text-o"></i></div>
+                <div class="metric-label">Báo giá tháng</div>
+                <div class="metric-value"><?= $this->sma->formatMoney($quotes_month_total); ?></div>
+                <div class="metric-sub"><?= isset($summary->quotes_month_count) ? (int) $summary->quotes_month_count : 0; ?> báo giá · <?= isset($summary->quotes_open_count) ? (int) $summary->quotes_open_count : 0; ?> đang mở</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="metric-card">
+                <div class="metric-icon bg-blue"><i class="fa fa-truck"></i></div>
+                <div class="metric-label">Nhập hàng tháng</div>
+                <div class="metric-value"><?= $this->sma->formatMoney($purchases_month_total); ?></div>
+                <div class="metric-sub"><?= isset($summary->purchases_month_count) ? (int) $summary->purchases_month_count : 0; ?> phiếu nhập</div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-xs-6">
+            <div class="metric-card">
+                <div class="metric-icon bg-red"><i class="fa fa-warning"></i></div>
+                <div class="metric-label">Tồn kho cần chú ý</div>
+                <div class="metric-value"><?= isset($summary->low_stock_count) ? (int) $summary->low_stock_count : 0; ?></div>
+                <div class="metric-sub"><?= isset($summary->products_count) ? (int) $summary->products_count : 0; ?> sản phẩm · <?= isset($summary->customers_count) ? (int) $summary->customers_count : 0; ?> khách hàng</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="modern-panel">
+                <div class="modern-panel-title"><i class="fa fa-bolt"></i> Tác vụ nhanh</div>
+                <div class="modern-actions-grid">
+                    <?php if ($can_products) { ?><a class="modern-action" href="<?= site_url('products') ?>"><i class="fa fa-barcode"></i> Sản phẩm</a><?php } ?>
+                    <?php if ($can_sales) { ?><a class="modern-action" href="<?= site_url('sales') ?>"><i class="fa fa-shopping-cart"></i> Bán hàng</a><?php } ?>
+                    <?php if ($can_quotes) { ?><a class="modern-action" href="<?= site_url('quotes') ?>"><i class="fa fa-files-o"></i> Báo giá</a><?php } ?>
+                    <?php if ($can_purchases) { ?><a class="modern-action" href="<?= site_url('purchases') ?>"><i class="fa fa-cart-plus"></i> Nhập hàng</a><?php } ?>
+                    <?php if ($can_transfers) { ?><a class="modern-action" href="<?= site_url('transfers') ?>"><i class="fa fa-refresh"></i> Chuyển kho</a><?php } ?>
+                    <?php if ($can_customers) { ?><a class="modern-action" href="<?= site_url('customers') ?>"><i class="fa fa-users"></i> Khách hàng</a><?php } ?>
+                    <?php if ($can_suppliers) { ?><a class="modern-action" href="<?= site_url('suppliers') ?>"><i class="fa fa-home"></i> Nhà cung cấp</a><?php } ?>
+                    <a class="modern-action" href="<?= site_url('notifications') ?>"><i class="fa fa-bell"></i> Thông báo</a>
+                    <?php if ($Owner) { ?><a class="modern-action" href="<?= site_url('system_settings') ?>"><i class="fa fa-cogs"></i> Cài đặt</a><?php } ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="modern-panel">
+                <div class="modern-panel-title"><i class="fa fa-clock-o"></i> Hoạt động mới</div>
+                <ul class="activity-list">
+                    <?php if (!empty($sales)) {
+                        foreach (array_slice($sales, 0, 2) as $item) { ?>
+                            <li>
+                                <span class="activity-dot bg-teal"></span>
+                                <div class="activity-main">
+                                    <div class="activity-title">Đơn bán <?= $item->reference_no; ?></div>
+                                    <div class="activity-meta"><?= $item->customer; ?> · <?= $this->sma->formatMoney($item->grand_total); ?></div>
+                                </div>
+                            </li>
+                        <?php }
+                    } ?>
+                    <?php if (!empty($quotes)) {
+                        foreach (array_slice($quotes, 0, 2) as $item) { ?>
+                            <li>
+                                <span class="activity-dot bg-orange"></span>
+                                <div class="activity-main">
+                                    <div class="activity-title">Báo giá <?= $item->reference_no; ?></div>
+                                    <div class="activity-meta"><?= $item->customer; ?> · <?= $this->sma->formatMoney($item->grand_total); ?></div>
+                                </div>
+                            </li>
+                        <?php }
+                    } ?>
+                    <?php if (empty($sales) && empty($quotes)) { ?>
+                        <li>
+                            <span class="activity-dot bg-blue"></span>
+                            <div class="activity-main">
+                                <div class="activity-title">Chưa có hoạt động mới</div>
+                                <div class="activity-meta">Dữ liệu sẽ hiển thị khi có đơn hoặc báo giá phát sinh.</div>
+                            </div>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php if ($Owner || $Admin) { ?>
-<div class="row" style="margin-bottom: 15px;">
+<div class="row dashboard-legacy-quick-links" style="display:none; margin-bottom: 15px;">
     <div class="col-lg-12">
         <div class="box">
             <div class="box-header">
@@ -112,7 +426,7 @@ function row_status($x)
     </div>
 </div>
 <?php } else { ?>
-<div class="row" style="margin-bottom: 15px;">
+<div class="row dashboard-legacy-quick-links" style="display:none; margin-bottom: 15px;">
     <div class="col-lg-12">
         <div class="box">
             <div class="box-header">

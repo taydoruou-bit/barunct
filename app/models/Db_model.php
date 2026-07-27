@@ -168,4 +168,57 @@ class Db_model extends CI_Model
         return FALSE;
     }
 
+    public function getDashboardSummary()
+    {
+        $today_start = date('Y-m-d') . ' 00:00:00';
+        $today_end = date('Y-m-d') . ' 23:59:59';
+        $month_start = date('Y-m-01') . ' 00:00:00';
+        $month_end = date('Y-m-t') . ' 23:59:59';
+        $user_filter = '';
+
+        if ($this->Settings->restrict_user && !$this->Owner && !$this->Admin) {
+            $user_id = (int) $this->session->userdata('user_id');
+            $user_filter = " AND created_by = {$user_id}";
+        }
+
+        $query = "
+            SELECT
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('sales') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS sales_today_count,
+                (SELECT COALESCE(SUM(grand_total), 0) FROM " . $this->db->dbprefix('sales') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS sales_today_total,
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('sales') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS sales_month_count,
+                (SELECT COALESCE(SUM(grand_total), 0) FROM " . $this->db->dbprefix('sales') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS sales_month_total,
+                (SELECT COALESCE(SUM(paid), 0) FROM " . $this->db->dbprefix('sales') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS sales_month_paid,
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('quotes') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS quotes_month_count,
+                (SELECT COALESCE(SUM(grand_total), 0) FROM " . $this->db->dbprefix('quotes') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS quotes_month_total,
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('quotes') . " WHERE status IN ('pending', 'sent') {$user_filter}) AS quotes_open_count,
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('purchases') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS purchases_month_count,
+                (SELECT COALESCE(SUM(grand_total), 0) FROM " . $this->db->dbprefix('purchases') . " WHERE date BETWEEN ? AND ? {$user_filter}) AS purchases_month_total,
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('companies') . " WHERE group_name = 'customer') AS customers_count,
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('products') . ") AS products_count,
+                (SELECT COUNT(*) FROM " . $this->db->dbprefix('products') . " p
+                    LEFT JOIN (
+                        SELECT product_id, SUM(COALESCE(quantity, 0)) AS quantity
+                        FROM " . $this->db->dbprefix('warehouses_products') . "
+                        GROUP BY product_id
+                    ) wp ON wp.product_id = p.id
+                    WHERE COALESCE(wp.quantity, 0) <= COALESCE(p.alert_quantity, 0)
+                ) AS low_stock_count
+        ";
+
+        $params = array(
+            $today_start, $today_end,
+            $today_start, $today_end,
+            $month_start, $month_end,
+            $month_start, $month_end,
+            $month_start, $month_end,
+            $month_start, $month_end,
+            $month_start, $month_end,
+            $month_start, $month_end,
+            $month_start, $month_end
+        );
+
+        $q = $this->db->query($query, $params);
+        return $q->num_rows() > 0 ? $q->row() : FALSE;
+    }
+
 }
