@@ -445,8 +445,9 @@ $('#saveCustomOptions').click(function(e) {
         overflow-x: auto;
     }
     .quote-edit-workspace #quTable {
+        table-layout: fixed;
         margin-bottom: 0;
-        min-width: 920px;
+        min-width: 860px;
     }
     .quote-edit-workspace #quTable thead th {
         background: #d8fbf7;
@@ -454,10 +455,68 @@ $('#saveCustomOptions').click(function(e) {
         color: #075985;
         font-size: 11px;
         font-weight: 900;
+        padding: 8px 6px;
         vertical-align: middle;
     }
     .quote-edit-workspace #quTable tbody td {
+        padding: 6px 6px;
         vertical-align: middle;
+    }
+    .quote-edit-workspace #quTable th:nth-child(1),
+    .quote-edit-workspace #quTable td:nth-child(1) {
+        width: 38%;
+    }
+    .quote-edit-workspace #quTable th:nth-child(2),
+    .quote-edit-workspace #quTable td:nth-child(2),
+    .quote-edit-workspace #quTable th:nth-child(3),
+    .quote-edit-workspace #quTable td:nth-child(3),
+    .quote-edit-workspace #quTable th:nth-child(4),
+    .quote-edit-workspace #quTable td:nth-child(4),
+    .quote-edit-workspace #quTable th:nth-child(5),
+    .quote-edit-workspace #quTable td:nth-child(5) {
+        width: 58px;
+    }
+    .quote-edit-workspace #quTable th:nth-child(6),
+    .quote-edit-workspace #quTable td:nth-child(6) {
+        width: 64px;
+    }
+    .quote-edit-workspace #quTable th:nth-child(7),
+    .quote-edit-workspace #quTable td:nth-child(7) {
+        width: 90px;
+    }
+    .quote-edit-workspace #quTable th:nth-child(8),
+    .quote-edit-workspace #quTable td:nth-child(8) {
+        width: 72px;
+    }
+    .quote-edit-workspace #quTable th:nth-child(9),
+    .quote-edit-workspace #quTable td:nth-child(9) {
+        width: 96px;
+    }
+    .quote-edit-workspace #quTable input.form-control,
+    .quote-edit-workspace #quTable select.form-control,
+    .quote-edit-workspace #quTable .select2-choice,
+    .quote-edit-workspace #quTable .custom-field-input {
+        border-radius: 7px !important;
+        box-sizing: border-box;
+        font-size: 13px;
+        height: 32px;
+        line-height: 20px;
+        min-height: 32px;
+        min-width: 0;
+        padding: 4px 6px;
+        text-align: center;
+        width: 100% !important;
+    }
+    .quote-edit-workspace #quTable td:first-child input.form-control,
+    .quote-edit-workspace #quTable .custom-field-input {
+        text-align: left;
+    }
+    .quote-edit-workspace #quTable textarea.form-control,
+    .quote-edit-workspace #quTable .rcomment,
+    .quote-edit-workspace #quTable .product-note {
+        font-size: 13px;
+        min-height: 34px;
+        padding: 6px 8px;
     }
     .quote-edit-workspace .lhson_baogia_add {
         background: rgba(255, 255, 255, .94);
