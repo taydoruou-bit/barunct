@@ -66,7 +66,7 @@
 
             <?php if ($Settings->logo2) {
 
-                echo '<img src="' . base_url('assets/uploads/logos/' . $Settings->logo2) . '" alt="' . $Settings->site_name . '" style="margin-bottom:10px;" />';
+                echo '<img src="' . base_url('assets/uploads/logos/' . $Settings->logo2) . '" alt="' . $Settings->site_name . '" class="login-brand-logo" />';
 
             } 					
 
@@ -849,9 +849,13 @@ button.btn.btn-primary.pull-right {
 
 }
 
-.page-back.bblue .text-center img {
+.login-brand-logo {
 
     max-width: 100%;
+    width: 410px;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 2px;
 
 }
 
@@ -895,4 +899,3 @@ i.shop_password_eye {
 </body>
 
 </html>
-
