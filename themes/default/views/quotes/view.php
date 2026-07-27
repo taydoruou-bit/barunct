@@ -31,6 +31,11 @@
                             </a>
                         </li>
                         <li>
+                            <a href="<?= site_url('quotes/pdf/' . $inv->id . '/1') ?>" target="_blank">
+                                <i class="fa fa-eye"></i> Xem thử báo giá
+                            </a>
+                        </li>
+                        <li>
                             <a href="<?= site_url('quotes/pdf/' . $inv->id) ?>">
                                 <i class="fa fa-file-pdf-o"></i> <?= lang('export_to_pdf') ?>
                             </a>
@@ -465,6 +470,11 @@ if ($Settings->tax1 && $inv->product_tax > 0) {
                     <div class="btn-group">
                         <a href="<?= site_url('sales/add/' . $inv->id) ?>" class="tip btn btn-primary" title="<?= lang('create_invoice') ?>">
                             <i class="fa fa-plus-circle"></i> <span class="hidden-sm hidden-xs"><?= lang('create_invoice') ?></span>
+                        </a>
+                    </div>
+                    <div class="btn-group">
+                        <a href="<?= site_url('quotes/pdf/' . $inv->id . '/1') ?>" target="_blank" class="tip btn btn-success" title="Xem thử báo giá">
+                            <i class="fa fa-eye"></i> <span class="hidden-sm hidden-xs">Xem thử</span>
                         </a>
                     </div>
                     <div class="btn-group">

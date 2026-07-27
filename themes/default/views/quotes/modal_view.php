@@ -9,6 +9,12 @@
                     <button type="button" class="btn btn-xs btn-default" onclick="window.print();">
                         <i class="fa fa-print"></i> <?= lang('print'); ?>
                     </button>
+                    <a href="<?= site_url('quotes/pdf/' . $inv->id . '/1') ?>"
+                        target="_blank"
+                        class="btn btn-xs btn-info tip"
+                        title="Xem thử báo giá">
+                        <i class="fa fa-eye"></i> Xem thử
+                    </a>
                     <a href="<?= site_url('quotes/image/' . $inv->id) ?>"
                         target="_blank"
                         class="btn btn-xs btn-success tip"
@@ -655,6 +661,12 @@
                                 <a href="<?= site_url('quotes/email/' . $inv->id) ?>" data-toggle="modal" data-target="#myModal2" class="tip btn btn-primary" title="<?= lang('email') ?>">
                                     <i class="fa fa-envelope-o"></i>
                                     <span class="hidden-sm hidden-xs"><?= lang('email') ?></span>
+                                </a>
+                            </div>
+                            <div class="btn-group">
+                                <a href="<?= site_url('quotes/pdf/' . $inv->id . '/1') ?>" target="_blank" class="tip btn btn-success" title="Xem thử báo giá">
+                                    <i class="fa fa-eye"></i>
+                                    <span class="hidden-sm hidden-xs">Xem thử</span>
                                 </a>
                             </div>
                             <div class="btn-group">

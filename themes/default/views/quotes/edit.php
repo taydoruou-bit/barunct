@@ -645,6 +645,10 @@ $('#saveCustomOptions').click(function(e) {
                 <i class="fa fa-refresh"></i>
                 <?= lang('reset') ?>
             </button>
+            <a href="<?= site_url('quotes/pdf/' . $id . '/1') ?>" target="_blank" class="btn btn-default btncls">
+                <i class="fa fa-eye"></i>
+                Xem thử báo giá
+            </a>
         </div>
     </div>
     <div class="box-content baogia_lhson">
