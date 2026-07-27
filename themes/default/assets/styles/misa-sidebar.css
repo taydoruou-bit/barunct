@@ -273,3 +273,90 @@
         box-shadow: 8px 0 28px rgba(15, 23, 42, .14);
     }
 }
+
+/* Compact view and safe dropdown rendering */
+.misa-erp-shell {
+    font-size: 90%;
+}
+
+.misa-erp-shell #navbar.navbar {
+    min-height: 50px;
+}
+
+.misa-erp-shell .navbar .navbar-brand,
+.misa-erp-shell .navbar .navbar-brand:hover,
+.misa-erp-shell .navbar .navbar-brand:focus,
+.misa-erp-shell .navbar .ace-nav > li > a,
+.misa-erp-shell .navbar .ace-nav > li > a:hover,
+.misa-erp-shell .navbar .ace-nav > li > a:focus {
+    height: 50px;
+    line-height: 50px;
+}
+
+.misa-erp-shell .nav-list > li > a,
+.misa-erp-shell .nav-list > li > a.dropdown-toggle,
+.misa-erp-shell .nav-list > li > a.dropmenu,
+.misa-erp-shell .nav-list > li > a.dropdown-s {
+    font-size: 12px;
+    height: 36px;
+    line-height: 36px;
+}
+
+.misa-erp-shell .nav-list > li > a > .menu-icon,
+.misa-erp-shell .nav-list > li > a > i:first-child {
+    flex-basis: 26px;
+    font-size: 13px;
+    height: 26px;
+    line-height: 26px;
+    width: 26px;
+}
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li > .submenu,
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li.open > .submenu {
+    display: none;
+    float: none !important;
+    left: auto !important;
+    max-height: none;
+    position: static !important;
+    top: auto !important;
+    width: auto !important;
+    z-index: auto !important;
+}
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li.open > .submenu {
+    display: block !important;
+}
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li > .submenu:before,
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li > .submenu > li:before,
+.misa-erp-shell #sidebar.menu-lhson .nav-list li.active > a:after {
+    display: none !important;
+}
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu {
+    margin: 3px 0 5px 36px;
+    padding: 2px 0 2px 8px;
+}
+
+.misa-erp-shell #sidebar.menu-lhson .nav-list > li .submenu > li > a {
+    font-size: 11px;
+    line-height: 28px;
+    min-height: 28px;
+}
+
+.misa-erp-shell .dashboard-hero {
+    padding: 22px 24px;
+}
+
+.misa-erp-shell .dashboard-hero h1 {
+    font-size: 25px;
+}
+
+.misa-erp-shell .metric-card {
+    min-height: 118px;
+    padding: 15px;
+}
+
+.misa-erp-shell .metric-value {
+    font-size: 19px;
+}
