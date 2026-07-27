@@ -37,6 +37,7 @@ div#s2id_sldoitacaddpt,div#doitac {
         localStorage.setItem('sltax2', '<?= $inv->order_tax_id ?>');
         localStorage.setItem('slshipping', '<?= $inv->shipping ?>');
         localStorage.setItem('slitems', JSON.stringify(<?= $inv_items; ?>));
+        
         <?php } ?>
 
         <?php if ($Owner || $Admin) { ?>
@@ -219,7 +220,48 @@ div#s2id_sldoitacaddpt,div#doitac {
 		
     });
 </script>
+<script>
+// ========== XỬ LÝ CUSTOM FIELDS - CHỈ TỪ DATABASE ==========
 
+$(document).ready(function() {
+    // Trước khi submit, đóng gói custom fields thành JSON
+    $('form.edit-so-form').on('submit', function(e) {
+        var customFieldsData = {
+            fields: [
+                {
+                    name: "fee_nhamay",
+                    label: "Phí nhà máy",
+                    value: $('#custom_fee_nhamay').val() || '0'
+                },
+                {
+                    name: "fee_phukien",
+                    label: "Phí phụ kiện",
+                    value: $('#custom_fee_phukien').val() || '0'
+                },
+                {
+                    name: "fee_lapdat",
+                    label: "Phí lắp đặt",
+                    value: $('#custom_fee_lapdat').val() || '0'
+                },
+                {
+                    name: "fee_chanhxe",
+                    label: "Chành xe",
+                    value: $('#custom_fee_chanhxe').val() || '0'
+                }
+            ]
+        };
+        $('#custom_fields_json').val(JSON.stringify(customFieldsData));
+    });
+
+    // Reset custom fields khi click nút reset
+    $('#reset').click(function() {
+        $('.custom-field').val('0');
+    });
+    $(document).on('change', '.custom-field', function() {
+    loadItems(); // Tính lại tổng
+});
+});
+</script>
 
 <div class="box">
 	 <?php
@@ -418,6 +460,47 @@ div#s2id_sldoitacaddpt,div#doitac {
 
 								</div>
 							</div>
+<div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Phí nhà máy", "custom_fee_nhamay"); ?>
+        <?php 
+        $fee_nhamay = isset($custom_fields_values['fee_nhamay']) ? $custom_fields_values['fee_nhamay'] : '0';
+        echo form_input('custom_fee_nhamay', $fee_nhamay, 'class="form-control input-tip custom-field" id="custom_fee_nhamay" placeholder="0"'); 
+        ?>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Phí phụ kiện", "custom_fee_phukien"); ?>
+        <?php 
+        $fee_phukien = isset($custom_fields_values['fee_phukien']) ? $custom_fields_values['fee_phukien'] : '0';
+        echo form_input('custom_fee_phukien', $fee_phukien, 'class="form-control input-tip custom-field" id="custom_fee_phukien" placeholder="0"'); 
+        ?>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Phí lắp đặt", "custom_fee_lapdat"); ?>
+        <?php 
+        $fee_lapdat = isset($custom_fields_values['fee_lapdat']) ? $custom_fields_values['fee_lapdat'] : '0';
+        echo form_input('custom_fee_lapdat', $fee_lapdat, 'class="form-control input-tip custom-field" id="custom_fee_lapdat" placeholder="0"'); 
+        ?>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Chành xe", "custom_fee_chanhxe"); ?>
+        <?php 
+        $fee_chanhxe = isset($custom_fields_values['fee_chanhxe']) ? $custom_fields_values['fee_chanhxe'] : '0';
+        echo form_input('custom_fee_chanhxe', $fee_chanhxe, 'class="form-control input-tip custom-field" id="custom_fee_chanhxe" placeholder="0"'); 
+        ?>
+    </div>
+</div>
+
+<input type="hidden" name="custom_fields" id="custom_fields_json" value="">
 
 							<div class="col-md-4">
 								<div class="form-group">

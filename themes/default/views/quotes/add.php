@@ -74,25 +74,12 @@
             }
         <?php } ?>
         <?php if ($Owner || $Admin) { ?>
-            if (!localStorage.getItem('qudate')) {
-                $("#qudate").datetimepicker({
-                    format: site.dateFormats.js_ldate,
-                    fontAwesome: true,
-                    language: 'sma',
-                    weekStart: 1,
-                    todayBtn: 1,
-                    autoclose: 1,
-                    todayHighlight: 1,
-                    startView: 2,
-                    forceParse: 0
-                }).datetimepicker('update', new Date());
+            if (qudate = localStorage.getItem('qudate')) {
+                $('#qudate').val(qudate);
             }
             $(document).on('change', '#qudate', function(e) {
                 localStorage.setItem('qudate', $(this).val());
             });
-            if (qudate = localStorage.getItem('qudate')) {
-                $('#qudate').val(qudate);
-            }
         <?php } ?>
         $(document).on('input', '.custom-field-input', function() {
             var $row = $(this).closest('tr');
@@ -130,64 +117,51 @@
         }
         ItemnTotals();
         $("#add_item").autocomplete({
-            source: function(request, response) {
-                if (!$('#qucustomer').val()) {
-                    $('#add_item').val('').removeClass('ui-autocomplete-loading');
-                    bootbox.alert('<?= lang('select_above'); ?>');
-                    //response('');
-                    $('#add_item').focus();
-                    return false;
-                }
-                $.ajax({
-                    type: 'get',
-                    url: '<?= site_url('quotes/suggestions'); ?>',
-                    dataType: "json",
-                    data: {
-                        term: request.term,
-                        warehouse_id: $("#quwarehouse").val(),
-                        customer_id: $("#qucustomer").val()
-                    },
-                    success: function(data) {
-                        $(this).removeClass('ui-autocomplete-loading');
-                        response(data);
-                    }
-                });
+    source: function(request, response) {
+        if (!$('#qucustomer').val()) {
+            $('#add_item').val('').removeClass('ui-autocomplete-loading');
+            bootbox.alert('<?= lang('select_above'); ?>');
+            $('#add_item').focus();
+            return false;
+        }
+        $.ajax({
+            type: 'get',
+            url: '<?= site_url('quotes/suggestions'); ?>',
+            dataType: "json",
+            data: {
+                term: request.term,
+                warehouse_id: $("#quwarehouse").val(),
+                customer_id: $("#qucustomer").val()
             },
-            minLength: 1,
-            autoFocus: false,
-            delay: 250,
-            response: function(event, ui) {
-                if ($(this).val().length >= 16 && ui.content[0].id == 0) {
-                    bootbox.alert('<?= lang('no_match_found') ?>', function() {
-                        $('#add_item').focus();
-                    });
-                    $(this).removeClass('ui-autocomplete-loading');
-                    $(this).val('');
-                } else if (ui.content.length == 1 && ui.content[0].id != 0) {
-                    ui.item = ui.content[0];
-                    $(this).data('ui-autocomplete')._trigger('select', 'autocompleteselect', ui);
-                    $(this).autocomplete('close');
-                    $(this).removeClass('ui-autocomplete-loading');
-                } else if (ui.content.length == 1 && ui.content[0].id == 0) {
-                    bootbox.alert('<?= lang('no_match_found') ?>', function() {
-                        $('#add_item').focus();
-                    });
-                    $(this).removeClass('ui-autocomplete-loading');
-                    $(this).val('');
-
-                }
-            },
-            select: function(event, ui) {
-                event.preventDefault();
-                if (ui.item.id !== 0) {
-                    var row = add_invoice_item(ui.item);
-                    if (row)
-                        $(this).val('');
-                } else {
-                    bootbox.alert('<?= lang('no_match_found') ?>');
-                }
+            success: function(data) {
+                $(this).removeClass('ui-autocomplete-loading');
+                response(data);
             }
         });
+    },
+    minLength: 1,
+    autoFocus: false,
+    delay: 250,
+    response: function(event, ui) {
+        // Không làm gì cả, chỉ remove loading indicator
+        $(this).removeClass('ui-autocomplete-loading');
+        
+        // Nếu có kết quả duy nhất và không phải "no match", tự động chọn
+        if (ui.content.length == 1 && ui.content[0].id != 0) {
+            ui.item = ui.content[0];
+            $(this).data('ui-autocomplete')._trigger('select', 'autocompleteselect', ui);
+            $(this).autocomplete('close');
+        }
+    },
+    select: function(event, ui) {
+        event.preventDefault();
+        if (ui.item.id !== 0) {
+            var row = add_invoice_item(ui.item);
+            if (row)
+                $(this).val('');
+        }
+    }
+});
 
         $('#addCustomOptions').click(function(e) {
             e.preventDefault();
@@ -223,115 +197,86 @@
         });
 
         $('#saveCustomOptions').click(function(e) {
-            e.preventDefault();
+    e.preventDefault();
 
-            var newColumns = [];
-            $('.custom-field-name').each(function() {
-                var value = $(this).val().trim();
-                if (value !== '') {
-                    newColumns.push(value);
-                }
-            });
+    var newColumns = [];
+    $('.custom-field-name').each(function() {
+        var value = $(this).val().trim();
+        if (value !== '') {
+            newColumns.push(value);
+        }
+    });
 
-            // THAY THÀNH:
-            $('#saveCustomOptions').click(function(e) {
-                e.preventDefault();
+    // Hiển thị loading
+    var $btn = $(this);
+    $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang lưu...');
 
-                var newColumns = [];
-                $('.custom-field-name').each(function() {
-                    var value = $(this).val().trim();
-                    if (value !== '') {
-                        newColumns.push(value);
-                    }
+    // Gửi AJAX request để lưu vào database
+    $.ajax({
+        type: 'POST',
+        url: '<?= site_url("quotes/save_custom_columns") ?>',
+        data: {
+            columns: newColumns
+        },
+        dataType: 'json',
+        success: function(response) {
+            $btn.prop('disabled', false).html('Lưu');
+
+            if (response.success) {
+                window.customColumns = response.columns;
+                customColumns = response.columns;
+
+                // Xóa các input hidden cũ
+                $('input[name="custom_columns[]"]').remove();
+
+                // Thêm hidden input để submit form sau này
+                customColumns.forEach(function(columnName) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'custom_columns[]',
+                        value: columnName
+                    }).appendTo('form');
                 });
 
-                // XÓA DÒNG IF KIỂM TRA này:
-                // if (newColumns.length === 0) {
-                //     bootbox.alert('Vui lòng nhập ít nhất một tên trường');
-                //     return;
-                // }
+                // Xóa các cột tùy chỉnh cũ trong bảng
+                $('#quTable thead tr th.custom-column-header').remove();
+                $('#quTable tbody tr td.custom-column-cell').remove();
 
-                // THAY BẰNG: cho phép lưu ngay cả khi không có cột nào
-                // (hoặc nếu muốn yêu cầu ít nhất 1 cột, giữ nguyên)
+                // Thêm header cho các cột mới
+                var $headerRow = $('#quTable thead tr');
+                var $priceHeader = $headerRow.find('th').eq(1);
 
-                // Hiển thị loading
-                var $btn = $(this);
-                $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang lưu...');
-
-                // Gửi AJAX request để lưu vào database
-                $.ajax({
-                    type: 'POST',
-                    url: '<?= site_url("quotes/save_custom_columns") ?>',
-                    data: {
-                        columns: newColumns // Sẽ là mảng rỗng nếu xóa hết
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        $btn.prop('disabled', false).html('Lưu');
-
-                        if (response.success) {
-                            window.customColumns = response.columns;
-                            customColumns = response.columns;
-
-                            // Xóa các input hidden cũ
-                            $('input[name="custom_columns[]"]').remove();
-
-                            // Thêm hidden input để submit form sau này
-                            customColumns.forEach(function(columnName) {
-                                $('<input>').attr({
-                                    type: 'hidden',
-                                    name: 'custom_columns[]',
-                                    value: columnName
-                                }).appendTo('form');
-                            });
-
-                            // Xóa các cột tùy chỉnh cũ trong bảng
-                            $('#quTable thead tr th.custom-column-header').remove();
-                            $('#quTable tbody tr td.custom-column-cell').remove();
-
-                            // Thêm header cho các cột mới (nếu còn cột nào)
-                            var $headerRow = $('#quTable thead tr');
-                            var $priceHeader = $headerRow.find('th').eq(1); // ← Cột thứ 2 là "Giá"
-
-                            customColumns.forEach(function(columnName) {
-                                $priceHeader.before('<th class="custom-column-header">' + columnName + '</th>');
-                                // Không cần update $priceHeader vì before() thêm vào trước nó
-                            });
-
-                            // Thêm cell cho các hàng hiện có
-                            // Thêm cell cho các hàng hiện có
-                            $('#quTable tbody tr').each(function() {
-                                var $row = $(this);
-                                var $priceTd = $row.find('td').eq(1); // ← Cột thứ 2 là "Giá"
-
-                                customColumns.forEach(function(columnName) {
-                                    var fieldName = 'custom_' + columnName.replace(/\s+/g, '_');
-                                    var cellHtml = '<td class="custom-column-cell">' +
-                                        '<input type="text" class="form-control custom-field-input" ' +
-                                        'name="' + fieldName + '[]" ' +
-                                        'placeholder="' + columnName + '">' +
-                                        '</td>';
-
-                                    // ✅ THÊM TRƯỚC cột giá
-                                    $priceTd.before(cellHtml);
-                                });
-                            });
-
-                            $('#customOptionsModal').modal('hide');
-                            bootbox.alert(response.message);
-                            audio_success.play();
-                        } else {
-                            bootbox.alert('Lỗi: ' + response.message);
-                            audio_error.play();
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        $btn.prop('disabled', false).html('Lưu');
-                        bootbox.alert('Lỗi kết nối: ' + error);
-                        audio_error.play();
-                    }
+                customColumns.forEach(function(columnName) {
+                    $priceHeader.before('<th class="custom-column-header">' + columnName + '</th>');
                 });
-            });
+
+                // Thêm cell cho các hàng hiện có
+                $('#quTable tbody tr').each(function() {
+                    var $row = $(this);
+                    var $priceTd = $row.find('td').eq(1);
+
+                    customColumns.forEach(function(columnName) {
+                        var fieldName = 'custom_' + columnName.replace(/\s+/g, '_');
+                        var cellHtml = '<td class="custom-column-cell">' +
+                            '<input type="text" class="form-control custom-field-input" ' +
+                            'name="' + fieldName + '[]" ' +
+                            'placeholder="' + columnName + '">' +
+                            '</td>';
+                        $priceTd.before(cellHtml);
+                    });
+                });
+
+                $('#customOptionsModal').modal('hide');
+                audio_success.play();
+            } else {
+                audio_error.play();
+            }
+        },
+        error: function(xhr, status, error) {
+            $btn.prop('disabled', false).html('Lưu');
+            audio_error.play();
+        }
+    });
         });
     });
 </script>
@@ -407,7 +352,6 @@
                                                     <th><?= lang("subtotal"); ?> (<span
                                                             class="currency"><?= $default_currency->code ?></span>)
                                                     </th>
-                                                    <th>Ghi chú</th>
                                                     <th style="width: 30px !important; text-align: center;"><i
                                                             class="fa fa-trash-o"
                                                             style="opacity:0.5; filter:alpha(opacity=50);"></i></th>
@@ -474,10 +418,40 @@
                             <?php if ($Owner || $Admin) { ?>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <?= lang("date", "qudate"); ?>
-                                        <?php echo form_input('date', (isset($_POST['date']) ? $_POST['date'] : ""), 'class="form-control input-tip datetime" id="qudate" required="required"'); ?>
+                                        <label for="qudate">Ngày nhận đơn</label>
+                                        <?php echo form_input('date', (isset($_POST['date']) ? $_POST['date'] : ""), 'class="form-control input-tip date" id="qudate" required="required" type="date"'); ?>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="shipping_date">Ngày giao chành</label>
+                                        <?php echo form_input('shipping_date', (isset($_POST['shipping_date']) ? $_POST['shipping_date'] : ""), 'class="form-control input-tip date" id="shipping_date" type="date"'); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="expected_delivery_date">Ngày khách nhận dự kiến</label>
+                                        <?php echo form_input('expected_delivery_date', (isset($_POST['expected_delivery_date']) ? $_POST['expected_delivery_date'] : ""), 'class="form-control input-tip date" id="expected_delivery_date" type="date"'); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="expected_installation_date">Ngày lắp đặt dự kiến</label>
+                                        <?php echo form_input('expected_installation_date', (isset($_POST['expected_installation_date']) ? $_POST['expected_installation_date'] : ""), 'class="form-control input-tip date" id="expected_installation_date" type="date"'); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+    <div class="form-group">
+        <label for="shipping_info">Thông tin chành xe</label>
+        <?php echo form_input('shipping_info', (isset($_POST['shipping_info']) ? $_POST['shipping_info'] : ""), 'class="form-control input-tip" id="shipping_info" placeholder="Ví dụ: Vận tải XYZ, giá ship 500k..."'); ?>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="form-group">
+        <label for="construction_address">Địa chỉ công trình</label>
+        <?php echo form_textarea('construction_address', (isset($_POST['construction_address']) ? $_POST['construction_address'] : ""), 'class="form-control input-tip" id="construction_address" rows="3" placeholder="Nhập địa chỉ công trình..."'); ?>
+    </div>
+</div>
                             <?php } ?>
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -538,11 +512,25 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
+    <div class="form-group">
+        <label for="deposit_amount">Số tiền đã cọc</label>
+        <?php echo form_input('deposit_amount', '', 'class="form-control input-tip" id="deposit_amount" type="number" step="0.01"'); ?>
+    </div>
+</div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <?= lang("status", "qustatus"); ?>
-                                    <?php $st = array('pending' => lang('pending'), 'sent' => lang('sent'));
-                                    echo form_dropdown('status', $st, '', 'class="form-control input-tip" id="qustatus"'); ?>
-
+                                    <?php 
+$st = array(
+    'Đang báo giá' => 'Đang báo giá',
+    'Đã chốt cọc' => 'Đã chốt cọc',
+    'Đã đặt hàng' => 'Đã đặt hàng',
+    'Đã giao chành' => 'Đã giao chành',
+    'Khách đã nhận' => 'Khách đã nhận',
+    'Hoàn thành' => 'Hoàn thành'
+);
+echo form_dropdown('status', $st, 'Đang báo giá', 'class="form-control input-tip" id="qustatus"'); 
+?>
                                 </div>
                             </div>
 
@@ -563,7 +551,7 @@
                             <div class="row" id="bt">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <?= lang("note", "qunote"); ?>
+                                        <label for="qunote">Ghi chú</label>
                                         <?php echo form_textarea('note', (isset($_POST['note']) ? $_POST['note'] : ""), 'class="form-control" id="qunote" style="margin-top: 10px; height: 100px;"'); ?>
                                     </div>
                                 </div>
@@ -651,6 +639,18 @@
                             <input type="text" class="form-control" id="pprice" <?= ($Owner || $Admin || $GP['edit_price']) ? '' : 'readonly'; ?>>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="popen_direction" class="col-sm-4 control-label">Hướng mở</label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="popen_direction">
+                                <option value="">-- Chọn --</option>
+                                <option value="H1 – Vào trái">H1 – Vào trái</option>
+                                <option value="H2 – Vào phải">H2 – Vào phải</option>
+                                <option value="H3 – Ra trái">H3 – Ra trái</option>
+                                <option value="H4 – Ra phải">H4 – Ra phải</option>
+                            </select>
+                        </div>
+                    </div>
                     <table class="table table-bordered table-striped">
                         <tr>
                             <th style="width:25%;"><?= lang('net_unit_price'); ?></th>
@@ -664,6 +664,7 @@
                     <input type="hidden" id="old_qty" value="" />
                     <input type="hidden" id="old_price" value="" />
                     <input type="hidden" id="row_id" value="" />
+                    <input type="hidden" id="item_id" value="" />
                 </form>
             </div>
             <div class="modal-footer">

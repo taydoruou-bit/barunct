@@ -53,6 +53,8 @@
             localStorage.setItem('qunote', '<?= str_replace(array("\r", "\n"), "", $this->sma->decode_html($inv->note)); ?>');
             localStorage.setItem('qutax2', '<?= $inv->order_tax_id ?>');
             localStorage.setItem('qushipping', '<?= $inv->shipping ?>');
+            localStorage.setItem('deposit_amount', '<?= $inv->deposit_amount ?>');
+
             localStorage.setItem('quitems', JSON.stringify(<?= $inv_items; ?>));
         <?php } ?>
 
@@ -124,26 +126,16 @@
             autoFocus: false,
             delay: 250,
             response: function(event, ui) {
-                if ($(this).val().length >= 16 && ui.content[0].id == 0) {
-                    bootbox.alert('<?= lang('no_match_found') ?>', function() {
-                        $('#add_item').focus();
-                    });
-                    $(this).removeClass('ui-autocomplete-loading');
-                    $(this).val('');
-                } else if (ui.content.length == 1 && ui.content[0].id != 0) {
-                    ui.item = ui.content[0];
-                    $(this).data('ui-autocomplete')._trigger('select', 'autocompleteselect', ui);
-                    $(this).autocomplete('close');
-                    $(this).removeClass('ui-autocomplete-loading');
-                } else if (ui.content.length == 1 && ui.content[0].id == 0) {
-                    bootbox.alert('<?= lang('no_match_found') ?>', function() {
-                        $('#add_item').focus();
-                    });
-                    $(this).removeClass('ui-autocomplete-loading');
-                    $(this).val('');
-
-                }
-            },
+    // Không làm gì cả, chỉ remove loading indicator
+    $(this).removeClass('ui-autocomplete-loading');
+    
+    // Nếu có kết quả duy nhất và không phải "no match", tự động chọn
+    if (ui.content.length == 1 && ui.content[0].id != 0) {
+        ui.item = ui.content[0];
+        $(this).data('ui-autocomplete')._trigger('select', 'autocompleteselect', ui);
+        $(this).autocomplete('close');
+    }
+},
             select: function(event, ui) {
                 event.preventDefault();
                 if (ui.item.id !== 0) {
@@ -385,7 +377,6 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
                                                     }
                                                     ?>
                                                     <th><?= lang("subtotal"); ?> (<span class="currency"><?= $default_currency->code ?></span>)</th>
-                                                    <th>Ghi chú</th>
                                                     <th style="width: 30px !important; text-align: center;"><i class="fa fa-trash-o" style="opacity:0.5; filter:alpha(opacity=50);"></i></th>
                                                 </tr>
                                             </thead>
@@ -429,12 +420,44 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
                                 </div>
                             </div>
                             <?php if ($Owner || $Admin) { ?>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <?= lang("date", "qudate"); ?>
-                                        <?php echo form_input('date', (isset($_POST['date']) ? $_POST['date'] : ""), 'class="form-control input-tip datetime" id="qudate" required="required"'); ?>
-                                    </div>
-                                </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="qudate">Ngày nhận đơn</label>
+            <?php echo form_input('date', (isset($_POST['date']) ? $_POST['date'] : ($inv->date ? date('Y-m-d', strtotime($inv->date)) : "")), 'class="form-control input-tip date" id="qudate" required="required" type="date"'); ?>
+        </div>
+    </div>
+<div class="col-md-4">
+    <div class="form-group">
+        <label for="shipping_date">Ngày giao chành</label>
+        <?php echo form_input('shipping_date', (isset($_POST['shipping_date']) ? $_POST['shipping_date'] : ($inv->shipping_date ? date('d/m/Y', strtotime($inv->shipping_date)) : "")), 'class="form-control input-tip date" id="shipping_date"'); ?>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="form-group">
+        <label for="expected_delivery_date">Ngày khách nhận dự kiến</label>
+        <?php echo form_input('expected_delivery_date', (isset($_POST['expected_delivery_date']) ? $_POST['expected_delivery_date'] : ($inv->expected_delivery_date ? date('d/m/Y', strtotime($inv->expected_delivery_date)) : "")), 'class="form-control input-tip date" id="expected_delivery_date"'); ?>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="form-group">
+        <label for="expected_installation_date">Ngày lắp đặt dự kiến</label>
+        <?php echo form_input('expected_installation_date', (isset($_POST['expected_installation_date']) ? $_POST['expected_installation_date'] : ($inv->expected_installation_date ? date('d/m/Y', strtotime($inv->expected_installation_date)) : "")), 'class="form-control input-tip date" id="expected_installation_date"'); ?>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="form-group">
+        <label for="shipping_info">Thông tin chành xe</label>
+        <?php echo form_input('shipping_info', (isset($_POST['shipping_info']) ? $_POST['shipping_info'] : $this->sma->decode_html($inv->shipping_info)), 'class="form-control input-tip" id="shipping_info" placeholder="Ví dụ: Vận tải XYZ, giá ship 500k..."'); ?>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="form-group">
+        <label for="construction_address">Địa chỉ công trình</label>
+        <?php echo form_textarea('construction_address', (isset($_POST['construction_address']) ? $_POST['construction_address'] : $this->sma->decode_html($inv->construction_address)), 'class="form-control input-tip" id="construction_address" rows="3" placeholder="Nhập địa chỉ công trình..."'); ?>
+    </div>
+</div>
                             <?php } ?>
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -488,10 +511,25 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
                                 </div>
                             </div>
                             <div class="col-md-4">
+    <div class="form-group">
+        <label for="deposit_amount">Số tiền đã cọc</label>
+        <?php echo form_input('deposit_amount', (isset($_POST['deposit_amount']) ? $_POST['deposit_amount'] : $inv->deposit_amount), 'class="form-control input-tip" id="deposit_amount" type="number" step="0.01"'); ?>
+    </div>
+</div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <?= lang("status", "qustatus"); ?>
-                                    <?php $st = array('pending' => lang('pending'), 'sent' => lang('sent'), 'completed' => lang('completed'));
-                                    echo form_dropdown('status', $st, '', 'class="form-control input-tip" id="qustatus"'); ?>
+                                    <?php 
+$st = array(
+    'Đang báo giá' => 'Đang báo giá',
+    'Đã chốt cọc' => 'Đã chốt cọc',
+    'Đã đặt hàng' => 'Đã đặt hàng',
+    'Đã giao chành' => 'Đã giao chành',
+    'Khách đã nhận' => 'Khách đã nhận',
+    'Hoàn thành' => 'Hoàn thành'
+);
+echo form_dropdown('status', $st, 'Đang báo giá', 'class="form-control input-tip" id="qustatus"'); 
+?>
 
                                 </div>
                             </div>
@@ -577,6 +615,7 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
             </div>
             <div class="modal-body" id="pr_popover_content">
                 <form class="form-horizontal" role="form">
+                    
                     <?php if ($Settings->tax1) { ?>
                         <div class="form-group">
                             <label class="col-sm-4 control-label"><?= lang('product_tax') ?></label>
@@ -624,6 +663,18 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
                             <input type="text" class="form-control" id="pprice" <?= ($Owner || $Admin || $GP['edit_price']) ? '' : 'readonly'; ?>>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="popen_direction" class="col-sm-4 control-label">Hướng mở</label>
+                        <div class="col-sm-8">
+                            <select class="form-control" id="popen_direction">
+                                <option value="">-- Chọn --</option>
+                                <option value="H1 – Vào trái">H1 – Vào trái</option>
+                                <option value="H2 – Vào phải">H2 – Vào phải</option>
+                                <option value="H3 – Ra trái">H3 – Ra trái</option>
+                                <option value="H4 – Ra phải">H4 – Ra phải</option>
+                            </select>
+                        </div>
+                    </div>
                     <table class="table table-bordered table-striped">
                         <tr>
                             <th style="width:25%;"><?= lang('net_unit_price'); ?></th>
@@ -637,6 +688,7 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
                     <input type="hidden" id="old_qty" value="" />
                     <input type="hidden" id="old_price" value="" />
                     <input type="hidden" id="row_id" value="" />
+                    <input type="hidden" id="item_id" value="" />
                 </form>
             </div>
             <div class="modal-footer">

@@ -464,7 +464,7 @@
                                     
                                 </ul>
                             </li>
-                            <li class="mm_doideim">
+                            <!-- <li class="mm_doideim">
                                 <a class="dropdown-s" href="<?= site_url('sales/gift_cards_qua'); ?>">
                                     <i class="menu-icon fa fa-gift"></i>
                                     <span class="menu-text"> <?= lang('Đổi điểm quà tặng'); ?> 
@@ -477,7 +477,7 @@
                                     <span class="menu-text"> <?= lang('Thẻ Giảm Giá'); ?> 
                                     </span> 
                                 </a>
-                            </li>	
+                            </li>	 -->
 							<li class="mm_doitac">
                                 <a class="dropdown-toggle" href="#">
                                     <i class="menu-icon fa fa-truck"></i>
@@ -498,7 +498,7 @@
                                     </li>
                                 </ul>
                             </li>
-							<li class="mm_returns">
+							<!-- <li class="mm_returns">
                                 <a class="dropdown-toggle" href="#">
                                     <i class="menu-icon fa fa-random"></i>
                                     <span class="menu-text text"> Thu hồi </span> 
@@ -530,7 +530,7 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
+                            </li> -->
                             <li class="mm_quotes">
                                 <a class="dropdown-toggle" href="#">
                                     <i class="menu-icon fa fa-files-o"></i>
@@ -552,7 +552,7 @@
                                     </li>
                                 </ul>
                             </li>
-							<?php if ($Settings->khuyenmai) { ?>
+							<!-- <?php if ($Settings->khuyenmai) { ?>
 							<li class="mm_khuyenmai">
 								<a class="dropdown-toggle" href="#">
                                     <i class="menu-icon fa fa-sort-numeric-desc"></i>
@@ -596,7 +596,7 @@
                                     </li>
                                 </ul>
                             </li>
-							<?php }?>
+							<?php }?> -->
                             <li class="mm_purchases">
                                 <a class="dropdown-toggle" href="#">
                                     <i class="menu-icon fa fa-cart-plus"></i>
@@ -746,7 +746,7 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li class="mm_transfers">
+                            <!-- <li class="mm_transfers">
                                 <a class="dropdown-toggle" href="#">
                                     <i class="menu-icon fa fa-refresh"></i>
                                     <span class="menu-text"> <?= lang('transfers'); ?> </span> 
@@ -769,7 +769,7 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
+                            </li> -->
 
                             <li class="mm_auth mm_customers mm_suppliers mm_billers">
                                 <a class="dropmenu" href="#">

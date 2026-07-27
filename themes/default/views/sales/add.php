@@ -95,6 +95,9 @@ $(document).ready(function() {
             if (localStorage.getItem('slpayment_term')) {
                 localStorage.removeItem('slpayment_term');
             }
+            if (localStorage.getItem('custom_fields')) {
+    localStorage.removeItem('custom_fields');
+}
             localStorage.removeItem('remove_slls');
         }
         <?php if($quote_id) { ?>
@@ -107,6 +110,19 @@ $(document).ready(function() {
         localStorage.setItem('sltax2', '<?= $quote->order_tax_id ?>');
         localStorage.setItem('slshipping', '<?= $quote->shipping ?>');
         localStorage.setItem('slitems', JSON.stringify(<?= $quote_items; ?>));
+        <?php if (!empty($quote->custom_fields)) {
+    $custom = json_decode($quote->custom_fields);
+    if (isset($custom->fields) && is_array($custom->fields)) {
+        $customData = array();
+        foreach ($custom->fields as $field) {
+            $customData[$field->name] = isset($field->value) ? $field->value : '0';
+        }
+        ?>
+        localStorage.setItem('custom_fields', '<?= json_encode($customData); ?>');
+        <?php
+    }
+} ?>
+
         <?php } ?>
         <?php if($this->input->get('customer')) { ?>
         if (!localStorage.getItem('slitems')) {
@@ -562,11 +578,19 @@ input#p_gia_si {
 							<?php } ?>
 
 							<div class="col-md-4">
-								<div class="form-group">
-									<?= lang("reference_no", "slref"); ?>
-									<?php echo form_input('reference_no', (isset($_POST['reference_no']) ? $_POST['reference_no'] : $slnumber), 'class="form-control input-tip" id="slref"'); ?>
-								</div>
-							</div>
+    <div class="form-group">
+        <?= lang("reference_no", "slref"); ?>
+        <?php 
+        // ✅ LẤYMÃ TỰ ĐỀ XUẤT CỦA HỆ THỐNG
+        $ref_value = $slnumber;
+        // ✅ NẾU CÓ quote_reference_no, DÙNG MÃ CỦA BÁOCHỈ
+        if (isset($quote_reference_no) && !empty($quote_reference_no)) {
+            $ref_value = $quote_reference_no;
+        }
+        echo form_input('reference_no', (isset($_POST['reference_no']) ? $_POST['reference_no'] : $ref_value), 'class="form-control input-tip" id="slref"'); 
+        ?>
+    </div>
+</div>
 							<?php if ($Owner || $Admin || !$this->session->userdata('biller_id')) { ?>
 								<div class="col-md-4">
 									<div class="form-group">
@@ -606,14 +630,14 @@ input#p_gia_si {
                             </div>
                         <?php } ?>
 
-                        <?php if ($Owner || $Admin || $this->session->userdata('allow_discount')) { ?>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <?= lang("order_discount", "sldiscount"); ?>
-                                    <?php echo form_input('order_discount', '', 'class="form-control input-tip" id="sldiscount"'); ?>
-                                </div>
-                            </div>
-                        <?php } ?>
+                       <?php if ($Owner || $Admin || $this->session->userdata('allow_discount')) { ?>
+    <div class="col-md-4">
+        <div class="form-group">
+            <?= lang("order_discount", "sldiscount"); ?>
+            <?php echo form_input('order_discount', '', 'class="form-control input-tip" id="sldiscount"'); ?>
+        </div>
+    </div>
+<?php } ?>
 						 <div class="col-md-4">
 							<div class="form-group" id="div_doitac_id">
 								<?= lang("Đối tác giao hàng", "doitac"); ?>
@@ -635,7 +659,36 @@ input#p_gia_si {
 
                             </div>
                         </div>
+                         <div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Phí nhà máy", "fee_nhamay"); ?>
+        <?php echo form_input('custom_fee_nhamay', '', 'class="form-control input-tip custom-field" id="custom_fee_nhamay"'); ?>
+    </div>
+</div>
 
+<div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Phí phụ kiện", "fee_phukien"); ?>
+        <?php echo form_input('custom_fee_phukien', '', 'class="form-control input-tip custom-field" id="custom_fee_phukien"'); ?>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Phí lắp đặt", "fee_lapdat"); ?>
+        <?php echo form_input('custom_fee_lapdat', '', 'class="form-control input-tip custom-field" id="custom_fee_lapdat"'); ?>
+    </div>
+</div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <?= lang("Chành xe", "fee_chanhxe"); ?>
+        <?php echo form_input('custom_fee_chanhxe', '', 'class="form-control input-tip custom-field" id="custom_fee_chanhxe"'); ?>
+    </div>
+</div>
+
+<!-- Hidden field để lưu JSON -->
+<input type="hidden" name="custom_fields" id="custom_fields_json" value="">           
                         <div class="col-md-4">
                             <div class="form-group">
                                 <?= lang("document", "document") ?>
@@ -646,11 +699,10 @@ input#p_gia_si {
 
                         <div class="col-md-4">
                             <div class="form-group">
-                                <?= lang("sale_status", "slsale_status"); ?>
-                                <?php $sst = array('completed' => lang('completed'), 'pending' => lang('pending'));
-                                echo form_dropdown('sale_status', $sst, '', 'class="form-control input-tip" required="required" id="slsale_status"'); ?>
-
-                            </div>
+    <?= lang("sale_status", "slsale_status"); ?>
+    <?php $sst = array('completed' => lang('completed'), 'pending' => lang('pending'));
+    echo form_dropdown('sale_status', $sst, 'pending', 'class="form-control input-tip" required="required" id="slsale_status"'); ?>
+</div>
                         </div>
                         <div class="col-md-4" style="display:none">
                             <div class="form-group">
@@ -1294,5 +1346,62 @@ ul#ui-id-3 {
             $(this).parent().parent('.input-group').children('input').val(no);
             return false;
         });
+        if (customFields = localStorage.getItem('custom_fields')) {
+    try {
+        var fields = JSON.parse(customFields);
+        if (fields.fee_nhamay) $('#custom_fee_nhamay').val(fields.fee_nhamay);
+        if (fields.fee_phukien) $('#custom_fee_phukien').val(fields.fee_phukien);
+        if (fields.fee_lapdat) $('#custom_fee_lapdat').val(fields.fee_lapdat);
+        if (fields.fee_chanhxe) $('#custom_fee_chanhxe').val(fields.fee_chanhxe);
+    } catch(e) {
+        console.log('Error loading custom fields:', e);
+    }
+}
+
+// Lưu custom fields vào localStorage khi thay đổi
+$(document).on('change blur', '.custom-field', function() {
+    var customFieldsData = {
+        fee_nhamay: $('#custom_fee_nhamay').val() || '0',
+        fee_phukien: $('#custom_fee_phukien').val() || '0',
+        fee_lapdat: $('#custom_fee_lapdat').val() || '0',
+        fee_chanhxe: $('#custom_fee_chanhxe').val() || '0'
+    };
+    localStorage.setItem('custom_fields', JSON.stringify(customFieldsData));
+});
+
+// Trước khi submit, đóng gói custom fields thành JSON
+$('form').on('submit', function(e) {
+    var customFieldsData = {
+        fields: [
+            {
+                name: "fee_nhamay",
+                label: "Phí nhà máy",
+                value: $('#custom_fee_nhamay').val() || '0'
+            },
+            {
+                name: "fee_phukien",
+                label: "Phí phụ kiện",
+                value: $('#custom_fee_phukien').val() || '0'
+            },
+            {
+                name: "fee_lapdat",
+                label: "Phí lắp đặt",
+                value: $('#custom_fee_lapdat').val() || '0'
+            },
+            {
+                name: "fee_chanhxe",
+                label: "Chành xe",
+                value: $('#custom_fee_chanhxe').val() || '0'
+            }
+        ]
+    };
+    $('#custom_fields_json').val(JSON.stringify(customFieldsData));
+});
+
+// Reset custom fields khi click nút reset
+$('#reset').on('click', function() {
+    $('.custom-field').val('');
+    localStorage.removeItem('custom_fields');
+});
     });
 </script>

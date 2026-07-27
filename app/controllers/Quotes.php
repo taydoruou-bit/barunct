@@ -53,7 +53,7 @@ class Quotes extends MY_Controller
             $user = $this->site->getUser();
             $warehouse_id = $user->warehouse_id;
         }
-        $print_link = anchor('quotes/printbaogia/$1', '<i class="fa fa-print"></i> ' . lang('In báo giá'), ' class="tip" data-toggle="modal" data-target="#myModal"');
+        // $print_link = anchor('quotes/printbaogia/$1', '<i class="fa fa-print"></i> ' . lang('In báo giá'), ' class="tip" data-toggle="modal" data-target="#myModal"');
         $detail_link = anchor('quotes/view/$1', '<i class="fa fa-file-text-o"></i> ' . lang('quote_details'));
         $email_link = anchor('quotes/email/$1', '<i class="fa fa-envelope"></i> ' . lang('email_quote'), 'data-toggle="modal" data-target="#myModal"');
         $edit_link = anchor('quotes/edit/$1', '<i class="fa fa-edit"></i> ' . lang('edit_quote'));
@@ -71,7 +71,7 @@ class Quotes extends MY_Controller
                         <li>' . $detail_link . '</li>
                         <li>' . $edit_link . '</li>
                         <li>' . $convert_link . '</li>
-						<li>' . $print_link . '</li>
+			
                         <li>' . $pc_link . '</li>
                         <li>' . $pdf_link . '</li>
                         <li>' . $email_link . '</li>
@@ -109,6 +109,11 @@ class Quotes extends MY_Controller
     }
     $this->data['error'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('error');
     $inv = $this->quotes_model->getQuoteByID($quote_id);
+    $inv->delivery_date = $inv->shipping_date;              // Ngày giao chành
+    $inv->received_date = $inv->expected_delivery_date;     // Ngày khách nhận dự kiến
+    $inv->install_date = $inv->expected_installation_date;
+    $inv->shipping_info = $inv->shipping_info;              // Thông tin chành xe
+    
     if (!$this->session->userdata('view_right')) {
         $this->sma->view_rights($inv->created_by, true);
     }
@@ -332,6 +337,9 @@ public function pdf($quote_id = null, $view = null, $save_bufffer = null)
             $quote_id = $this->input->get('id');
         }
         $inv = $this->quotes_model->getQuoteByID($quote_id);
+        $inv->delivery_date = $inv->shipping_date;              // Ngày giao chành
+$inv->received_date = $inv->expected_delivery_date;     // Ngày khách nhận dự kiến
+$inv->install_date = $inv->expected_installation_date;  // Ngày lắp đặt dự kiến
         $this->form_validation->set_rules('to', $this->lang->line("to") . " " . $this->lang->line("email"), 'trim|required|valid_email');
         $this->form_validation->set_rules('subject', $this->lang->line("subject"), 'trim|required');
         $this->form_validation->set_rules('cc', $this->lang->line("cc"), 'trim|valid_emails');
@@ -616,6 +624,12 @@ public function pdf($quote_id = null, $view = null, $save_bufffer = null)
             $data = array(
                 'date' => $date,
                 'reference_no' => $reference,
+                'shipping_date' => $this->input->post('shipping_date') ? $this->sma->fld($this->input->post('shipping_date')) : NULL,
+    'expected_delivery_date' => $this->input->post('expected_delivery_date') ? $this->sma->fld($this->input->post('expected_delivery_date')) : NULL,
+    'expected_installation_date' => $this->input->post('expected_installation_date') ? $this->sma->fld($this->input->post('expected_installation_date')) : NULL,
+    'shipping_info' => $this->input->post('shipping_info') ? $this->sma->clear_tags($this->input->post('shipping_info')) : NULL,
+    'construction_address' => $this->input->post('construction_address') ? $this->sma->clear_tags($this->input->post('construction_address')) : NULL,
+    'deposit_amount' => $this->input->post('deposit_amount') ? $this->sma->formatDecimal($this->input->post('deposit_amount')) : 0,
                 'customer_id' => $customer_id,
                 'customer' => $customer,
                 'biller_id' => $biller_id,
@@ -898,6 +912,12 @@ public function pdf($quote_id = null, $view = null, $save_bufffer = null)
             $data = array(
                 'date' => $date,
                 'reference_no' => $reference,
+                'shipping_date' => $this->input->post('shipping_date') ? $this->sma->fld($this->input->post('shipping_date')) : NULL,
+    'expected_delivery_date' => $this->input->post('expected_delivery_date') ? $this->sma->fld($this->input->post('expected_delivery_date')) : NULL,
+    'expected_installation_date' => $this->input->post('expected_installation_date') ? $this->sma->fld($this->input->post('expected_installation_date')) : NULL,
+    'shipping_info' => $this->input->post('shipping_info') ? $this->sma->clear_tags($this->input->post('shipping_info')) : NULL,
+    'construction_address' => $this->input->post('construction_address') ? $this->sma->clear_tags($this->input->post('construction_address')) : NULL,
+    'deposit_amount' => $this->input->post('deposit_amount') ? $this->sma->formatDecimal($this->input->post('deposit_amount')) : 0,
                 'customer_id' => $customer_id,
                 'customer' => $customer,
                 'biller_id' => $biller_id,
@@ -953,6 +973,9 @@ public function pdf($quote_id = null, $view = null, $save_bufffer = null)
             // ✅ THAY THẾ TOÀN BỘ ĐOẠN NÀY
             $this->data['inv'] = $this->quotes_model->getQuoteByID($id);
             $inv_items = $this->quotes_model->getAllQuoteItems($id);
+            $this->data['inv']->shipping_date = $this->data['inv']->shipping_date ? date('Y-m-d', strtotime($this->data['inv']->shipping_date)) : '';
+$this->data['inv']->expected_delivery_date = $this->data['inv']->expected_delivery_date ? date('Y-m-d', strtotime($this->data['inv']->expected_delivery_date)) : '';
+$this->data['inv']->expected_installation_date = $this->data['inv']->expected_installation_date ? date('Y-m-d', strtotime($this->data['inv']->expected_installation_date)) : '';
             $this->data['custom_columns'] = $this->quotes_model->getCustomColumns();
             krsort($inv_items);
 
@@ -995,13 +1018,9 @@ public function pdf($quote_id = null, $view = null, $save_bufffer = null)
                 $row->unit = $item->product_unit_id;
                 $row->qty = $item->unit_quantity;
                 $row->discount = $item->discount ? $item->discount : '0';
-                $row->price = $this->sma->formatDecimal($item->net_unit_price +
-                    $this->sma->formatDecimal($item->item_discount / $item->quantity));
-                $row->unit_price = $row->tax_method ?
-                    $item->unit_price + $this->sma->formatDecimal($item->item_discount / $item->quantity) +
-                    $this->sma->formatDecimal($item->item_tax / $item->quantity) :
-                    $item->unit_price + ($item->item_discount / $item->quantity);
-                $row->real_unit_price = $item->real_unit_price;
+                $row->price = $item->real_unit_price;
+$row->unit_price = $item->net_unit_price;
+$row->real_unit_price = $item->real_unit_price;
                 $row->tax_rate = $item->tax_rate_id;
                 $row->option = $item->option_id;
 
@@ -1502,4 +1521,115 @@ public function pdf($quote_id = null, $view = null, $save_bufffer = null)
 
         return true;
     }
+    // ============ THÊM HÀM NÀY VÀO FILE Quotes.php (Controller) ============
+// Đặt ngay sau hàm pdf()
+
+// ============ THÊM/THAY HÀM NÀY VÀO Quotes.php ============
+public function image($quote_id = null)
+{
+    $this->sma->checkPermissions();
+
+    if ($this->input->get('id')) {
+        $quote_id = $this->input->get('id');
+    }
+    
+    $this->data['error'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('error');
+    $inv = $this->quotes_model->getQuoteByID($quote_id);
+    
+    if (!$this->session->userdata('view_right')) {
+        $this->sma->view_rights($inv->created_by);
+    }
+    
+    $raw_rows = $this->quotes_model->getAllQuoteItems($quote_id);
+
+    // Nhóm sản phẩm
+    $grouped_rows = array();
+    $current_main_index = -1;
+
+    foreach ($raw_rows as $row) {
+        if ($row->group_id == 30 || $row->group_id == 0 || $row->group_id === NULL) {
+            $grouped_rows[] = array(
+                'main' => $row,
+                'color' => null,
+                'lock' => null,
+                'image' => $row->image
+            );
+            $current_main_index++;
+        } 
+        elseif ($row->group_id == 31 && $current_main_index >= 0) {
+            $grouped_rows[$current_main_index]['color'] = $row;
+        } 
+        elseif ($row->group_id == 32 && $current_main_index >= 0) {
+            $grouped_rows[$current_main_index]['lock'] = $row;
+        } 
+        else {
+            $grouped_rows[] = array(
+                'main' => $row,
+                'color' => null,
+                'lock' => null,
+                'image' => $row->image
+            );
+            $current_main_index++;
+        }
+    }
+
+    $this->data['rows'] = $grouped_rows;
+    $this->data['custom_columns'] = $this->quotes_model->getCustomColumns();
+    $this->data['customer'] = $this->site->getCompanyByID($inv->customer_id);
+    $this->data['biller'] = $this->site->getCompanyByID($inv->biller_id);
+    $this->data['user'] = $this->site->getUser($inv->created_by);
+    $this->data['warehouse'] = $this->site->getWarehouseByID($inv->warehouse_id);
+    $this->data['inv'] = $inv;
+    
+    // ✅ Load view image.php với JavaScript để tự động chụp ảnh
+    $this->load->view($this->theme . 'quotes/image', $this->data);
 }
+
+// Hàm helper để tạo ảnh từ HTML
+private function generate_image($html, $filename)
+{
+    // Cài đặt thư viện wkhtmltoimage
+    // Đường dẫn đến wkhtmltoimage (cần cài đặt trên server)
+    $wkhtmltoimage_path = '/usr/local/bin/wkhtmltoimage'; // Linux
+    // Hoặc: C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe // Windows
+    
+    // Tạo file HTML tạm
+    $temp_html = sys_get_temp_dir() . '/' . uniqid() . '.html';
+    file_put_contents($temp_html, $html);
+    
+    // Tạo file ảnh output
+    $output_file = sys_get_temp_dir() . '/' . $filename . '.png';
+    
+    // Command để chuyển HTML sang PNG
+    $cmd = sprintf(
+        '%s --width 1200 --quality 95 --enable-local-file-access %s %s',
+        $wkhtmltoimage_path,
+        escapeshellarg($temp_html),
+        escapeshellarg($output_file)
+    );
+    
+    // Thực thi command
+    exec($cmd, $output, $return_var);
+    
+    if ($return_var === 0 && file_exists($output_file)) {
+        // Download file
+        header('Content-Description: File Transfer');
+        header('Content-Type: image/png');
+        header('Content-Disposition: attachment; filename="' . $filename . '.png"');
+        header('Content-Length: ' . filesize($output_file));
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        
+        readfile($output_file);
+        
+        // Xóa file tạm
+        unlink($temp_html);
+        unlink($output_file);
+    } else {
+        // Nếu lỗi, sử dụng phương án dự phòng với PhantomJS hoặc thông báo lỗi
+        $this->session->set_flashdata('error', 'Không thể tạo ảnh. Vui lòng cài đặt wkhtmltoimage.');
+        redirect('quotes/view/' . $this->input->get('id'));
+    }
+}
+}
+

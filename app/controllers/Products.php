@@ -23,7 +23,7 @@ class Products extends MY_Controller
         $this->thumbs_path = 'assets/uploads/thumbs/';
         $this->image_types = 'gif|jpg|jpeg|png|tif';
         $this->digital_file_types = 'zip|psd|ai|rar|pdf|doc|docx|xls|xlsx|ppt|pptx|gif|jpg|jpeg|png|tif|txt';
-        $this->allowed_file_size = '1024';
+        $this->allowed_file_size = '10240';
         $this->popup_attributes = array('width' => '900', 'height' => '600', 'window_name' => 'sma_popup', 'menubar' => 'yes', 'scrollbars' => 'yes', 'status' => 'no', 'resizable' => 'yes', 'screenx' => '0', 'screeny' => '0');
     }
 

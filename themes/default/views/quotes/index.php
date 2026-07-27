@@ -1,6 +1,57 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <script>
     $(document).ready(function () {
+        // Function để hiển thị status với màu sắc
+    function row_status(data, type, full) {
+    var status_map = {
+        'Đang báo giá': {
+            label: 'Đang báo giá',
+            class: 'status-dang-bao-gia'
+        },
+        'Đã chốt cọc': {  // ← THAY ĐỔI Ở ĐÂY
+            label: 'Đã chốt cọc',
+            class: 'status-da-chot-coc'
+        },
+        'Đã đặt hàng': {
+            label: 'Đã đặt hàng',
+            class: 'status-da-dat-hang'
+        },
+        'Đã giao chành': {
+            label: 'Đá giao chành',
+            class: 'status-da-giao-chanh'
+        },
+        'Khách đã nhận': {
+            label: 'Khách đã nhận',
+            class: 'status-khach-da-nhan'
+        },
+        'Hoàn thành': {
+            label: 'Hoàn thành',
+            class: 'status-hoan-thanh'
+        }
+    };
+    
+    // Kiểm tra nếu status tồn tại trong map
+    if (status_map[data]) {
+        return '<span class="status-badge ' + status_map[data].class + '">' + 
+               status_map[data].label + '</span>';
+    }
+    
+    // Nếu không có trong map, hiển thị text thường
+    return '<span class="status-badge">' + data + '</span>';
+}function formatDateOnly(data, type, full) {
+            if (data && type === 'display') {
+                // Tách lấy phần ngày, bỏ phần giờ
+                var dateOnly = data.split(' ')[0];
+                
+                // Chuyển đổi từ yyyy-mm-dd sang dd/mm/yyyy
+                var parts = dateOnly.split('-');
+                if (parts.length === 3) {
+                    return parts[2] + '/' + parts[1] + '/' + parts[0];
+                }
+                return dateOnly;
+            }
+            return data;
+        }
         oTable = $('#QUData').dataTable({
             "aaSorting": [[1, "desc"]],
             "aLengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "<?= lang('all') ?>"]],
@@ -20,7 +71,7 @@
                 nRow.className = "quote_link";
                 return nRow;
             },
-            "aoColumns": [{"bSortable": false,"mRender": checkbox}, {"mRender": fld}, null, null, null, null, {"mRender": currencyFormat}, {"mRender": row_status}, {"bSortable": false,"mRender": attachment}, {"bSortable": false}]
+            "aoColumns": [{"bSortable": false,"mRender": checkbox}, {"mRender": formatDateOnly}, null, null, null, null, {"mRender": currencyFormat}, {"mRender": row_status}, {"bSortable": false,"mRender": attachment}, {"bSortable": false}]
         }).fnSetFilteringDelay().dtFilter([
             {column_number: 1, filter_default_label: "[<?=lang('date');?> (yyyy-mm-dd)]", filter_type: "text", data: []},
             {column_number: 2, filter_default_label: "[<?=lang('reference_no');?>]", filter_type: "text", data: []},
@@ -168,3 +219,51 @@
     </div>
     <?= form_close() ?>
 <?php } ?>
+<style>
+/* Style cho status badges trong danh sách */
+.status-badge {
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 11px;
+    display: inline-block;
+    color: white;
+    text-align: center;
+    min-width: 140px;
+    max-width: 200px;
+    white-space: normal; /* Cho phép xuống dòng */
+    line-height: 1.4; /* Khoảng cách giữa các dòng */
+    word-wrap: break-word; /* Tự động xuống dòng */
+}
+
+.status-dang-bao-gia {
+    background-color: #5bc0de;
+}
+
+.status-da-chot-coc {
+    background-color: #f0ad4e;
+}
+
+.status-da-dat-hang {
+    background-color: #337ab7;
+}
+
+.status-da-giao-chanh {
+    background-color: #9b59b6;
+}
+
+.status-khach-da-nhan {
+    background-color: #27ae60;
+}
+
+.status-hoan-thanh {
+    background-color: #5cb85c;
+}
+
+/* Tăng chiều rộng cột status trong bảng */
+#QUData thead th:nth-child(8),
+#QUData tbody td:nth-child(8) {
+    min-width: 160px !important;
+    max-width: 200px !important;
+}
+</style>

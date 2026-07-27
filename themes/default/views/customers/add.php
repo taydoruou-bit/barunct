@@ -75,7 +75,7 @@
 
                     <div class="form-group ngaysinh">
                         <?= lang("Ngày sinh", "ngaysinh"); ?>
-                        <?php echo form_input('ngaysinh', (isset($_POST['ngaysinh']) ? $_POST['ngaysinh'] : ""), 'class="form-control date" place_holder="Ngày-tháng-năm" id="ngaysinh" required="required" autocomplete="off"'); ?>
+                        <?php echo form_input('ngaysinh', (isset($_POST['ngaysinh']) ? $_POST['ngaysinh'] : ""), 'class="form-control date" place_holder="Ngày-tháng-năm" id="ngaysinh" autocomplete="off"'); ?>
                     </div>
                     <div class="form-group">
                         <?= lang("phone", "phone"); ?>

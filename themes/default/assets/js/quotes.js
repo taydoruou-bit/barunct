@@ -44,6 +44,14 @@ $(document).ready(function () {
         shipping = 0;
     }
 
+    // ✅ FIX: Load date from localStorage to #qudate
+    if (qudate = localStorage.getItem('qudate')) {
+        $('#qudate').val(qudate);
+    }
+    $('#qudate').change(function (e) {
+        localStorage.setItem('qudate', $(this).val());
+    });
+
     $('#qusupplier').change(function (e) {
         localStorage.setItem('qusupplier', $(this).val());
         $('#supplier_id').val($(this).val());
@@ -253,20 +261,17 @@ $(document).ready(function () {
      * Delete Row Method
      * ---------------------- */
     $(document).on('click', '.qudel', function () {
-        var row = $(this).closest('tr');
-        var item_id = row.attr('data-item-id');
+    var row = $(this).closest('tr');
+    var item_id = row.attr('data-item-id');
 
-        // Debug: xem item_id có đúng không
-        console.log('Deleting item_id:', item_id);
-        console.log('Before delete:', Object.keys(quitems));
+    // ✅ XÓA CẢ NOTE ROW
+    row.next('.note-row[data-item-id="' + item_id + '"]').remove();
 
-        delete quitems[item_id];
+    delete quitems[item_id];
 
-        console.log('After delete:', Object.keys(quitems));
-
-        localStorage.setItem('quitems', JSON.stringify(quitems));
-        loadItems();
-    });
+    localStorage.setItem('quitems', JSON.stringify(quitems));
+    loadItems();
+});
 
     /* -----------------------
      * Edit Row Modal Hanlder
@@ -278,7 +283,7 @@ $(document).ready(function () {
         item = quitems[item_id];
         var qty = row.children().children('.rquantity').val(),
             product_option = row.children().children('.roption').val(),
-            unit_price = formatDecimal(row.children().children('.ruprice').val()),
+            unit_price = parseFloat(item.row.price) || parseFloat(item.row.real_unit_price),
             discount = row.children().children('.rdiscount').val();
         if (item.options !== false) {
             $.each(item.options, function () {
@@ -372,6 +377,7 @@ $(document).ready(function () {
         $('#pdiscount').val(discount);
         $('#net_price').text(formatMoney(net_price - item_discount));
         $('#pro_tax').text(formatMoney(pr_tax_val));
+        
         $('#prModal').appendTo("body").modal('show');
 
     });
@@ -727,8 +733,27 @@ $(document).on('click', '#editItem', function () {
         }
         var new_price = parseFloat($(this).val()),
             item_id = row.attr('data-item-id');
+        
+        // Cập nhật giá trong quitems
         quitems[item_id].row.price = new_price;
+        quitems[item_id].row.real_unit_price = new_price;
+        
+        // ✅ CẬP NHẬT INPUT HIDDEN unit_price[] để gửi lên server
+        row.find('.ruprice').val(new_price);
+        
         localStorage.setItem('quitems', JSON.stringify(quitems));
+        
+        // Tính toán lại subtotal mà không cần load lại toàn bộ items
+        var item_qty = parseFloat(row.find('.rquantity').val());
+        var pr_tax_val = parseFloat(row.find('.rprice').attr('data-tax-val')) || 0;
+        
+        // Subtotal = (giá + thuế) * số lượng
+        var new_subtotal = (new_price + pr_tax_val) * item_qty;
+        
+        // Cập nhật subtotal hiển thị
+        row.find('.ssubtotal').text(formatMoney(new_subtotal));
+        
+        // Cập nhật ItemnTotals
         loadItems();
     });
 
@@ -810,15 +835,13 @@ function loadItems() {
         quitems = JSON.parse(localStorage.getItem('quitems'));
         // KHÔNG DÙNG sortedItems nữa, duyệt trực tiếp quitems
         $('#add_sale, #edit_sale').attr('disabled', false);
-        $.each(quitems, function (key, value) {  // ← Duyệt quitems thay vì sortedItems
-            var item = value;  // ← Dùng value thay vì this
-            var item_id = key;  // ← Bây giờ key mới là timestamp
-            var item = this;
-            var item_id = key;  // ← SỬA DÒNG NÀY: dùng key của object (timestamp)
+        $.each(quitems, function (key, value) {
+            var item = value;
+            var item_id = key;
             item.order = item.order ? item.order : new Date().getTime();
             var product_id = item.row.id, item_type = item.row.type, combo_items = item.combo_items, item_price = item.row.price, item_qty = item.row.qty, item_aqty = item.row.quantity, item_tax_method = item.row.tax_method, item_ds = item.row.discount, item_discount = 0, item_option = item.row.option, item_code = item.row.code, item_serial = item.row.serial, item_name = item.row.name.replace(/"/g, "&#034;").replace(/'/g, "&#039;");
 
-            var unit_price = item.row.real_unit_price;
+            var unit_price = item.row.price ? item.row.price : (item.row.unit_price ? item.row.unit_price : item.row.real_unit_price);
             var product_unit = item.row.unit, base_quantity = item.row.base_quantity;
             if (item.row.fup != 1 && product_unit != item.row.base_unit) {
                 $.each(item.units, function () {
@@ -831,26 +854,21 @@ function loadItems() {
             if (item.options !== false) {
                 $.each(item.options, function () {
                     if (this.id == item.row.option && this.price != 0 && this.price != '' && this.price != null) {
-                        item_price = unit_price + (parseFloat(this.price));
-                        unit_price = item_price;
+                        unit_price = unit_price + (parseFloat(this.price));
+                        item_price = unit_price;
                     }
                 });
             }
 
+            // ✅ FIX: item_ds là discount đã áp dụng trước đó, không cần tính lại
             var ds = item_ds ? item_ds : '0';
-            if (ds.indexOf("%") !== -1) {
-                var pds = ds.split("%");
-                if (!isNaN(pds[0])) {
-                    item_discount = formatDecimal((((unit_price) * parseFloat(pds[0])) / 100), 4);
-                } else {
-                    item_discount = formatDecimal(ds);
-                }
-            } else {
-                item_discount = formatDecimal(ds);
+            var item_discount = 0;
+            if (ds && ds !== '0') {
+                // Nếu có discount, lấy từ item.row.discount (đã lưu từ lần tạo)
+                item_discount = item.row.item_discount ? parseFloat(item.row.item_discount) / parseFloat(item_qty) : 0;
             }
-            product_discount += parseFloat(item_discount * item_qty);
+            product_discount += parseFloat(item.row.item_discount ? item.row.item_discount : 0);
 
-            unit_price = formatDecimal(unit_price - item_discount);
             var pr_tax = item.tax_rate;
             var pr_tax_val = 0, pr_tax_rate = 0;
             if (site.settings.tax1 == 1) {
@@ -891,20 +909,37 @@ if (customColumns && customColumns.length > 0) {
         var fieldName = 'custom_' + columnName.replace(/\s+/g, '_');
         var fieldValue = '';
 
-        // ✅ ĐOẠN NÀY PHẢI ĐÚNG
         if (item.custom_fields && item.custom_fields[fieldName]) {
             fieldValue = item.custom_fields[fieldName];
         }
 
-        tr_html += '<td class="custom-column-cell">' +
-            '<input type="text" class="form-control custom-field-input" ' +
-            'name="' + fieldName + '[]" ' +
-            'value="' + fieldValue + '" ' +
-            'placeholder="' + columnName + '">' +
-            '</td>';
+        var cellHtml;
+        if (columnName === 'Hướng mở') {
+    // ✅ Decode HTML entities
+    var decodedValue = $('<div/>').html(fieldValue).text().toUpperCase();
+    
+    cellHtml = '<td class="custom-column-cell">' +
+        '<select class="form-control custom-field-input" name="' + fieldName + '[]">' +
+            '<option value="">-- Chọn --</option>' +
+            '<option value="H1 – Vào trái"' + (decodedValue.indexOf('H1') > -1 && decodedValue.indexOf('TRÁI') > -1 && decodedValue.indexOf('VÀO') > -1 ? ' selected' : '') + '>H1 – Vào trái</option>' +
+            '<option value="H2 – Vào phải"' + (decodedValue.indexOf('H2') > -1 && decodedValue.indexOf('PHẢI') > -1 && decodedValue.indexOf('VÀO') > -1 ? ' selected' : '') + '>H2 – Vào phải</option>' +
+            '<option value="H3 – Ra trái"' + (decodedValue.indexOf('H3') > -1 && decodedValue.indexOf('TRÁI') > -1 ? ' selected' : '') + '>H3 – Ra trái</option>' +
+            '<option value="H4 – Ra phải"' + (decodedValue.indexOf('H4') > -1 && decodedValue.indexOf('PHẢI') > -1 ? ' selected' : '') + '>H4 – Ra phải</option>' +
+        '</select>' +
+        '</td>';
+} else {
+            cellHtml = '<td class="custom-column-cell">' +
+                '<input type="text" class="form-control custom-field-input" ' +
+                'name="' + fieldName + '[]" ' +
+                'value="' + fieldValue + '" ' +
+                'placeholder="' + columnName + '">' +
+                '</td>';
+        }
+        
+        tr_html += cellHtml;
     });
 }
-            tr_html += '<td class="text-right"><input class="form-control input-sm text-right rprice" name="net_price[]" type="hidden" id="price_' + row_no + '" value="' + formatDecimal(item_price) + '"><input class="ruprice" name="unit_price[]" type="hidden" value="' + unit_price + '"><input class="realuprice" name="real_unit_price[]" type="hidden" value="' + item.row.real_unit_price + '"><span class="text-right sprice" id="sprice_' + row_no + '">' + formatMoney(item_price) + '</span></td>';
+            tr_html += '<td class="text-right"><input class="form-control input-sm text-right rprice" name="net_price[]" type="text" id="price_' + row_no + '" value="' + formatDecimal(item_price) + '" data-item="' + item_id + '" data-original-price="' + formatDecimal(item_price) + '" data-tax-val="' + pr_tax_val + '"><input class="ruprice" name="unit_price[]" type="hidden" value="' + formatDecimal(unit_price) + '"><input class="realuprice" name="real_unit_price[]" type="hidden" value="' + item.row.real_unit_price + '"></td>';
             tr_html += '<td><input class="form-control text-center rquantity" tabindex="' + ((site.settings.set_focus == 1) ? an : (an + 1)) + '" name="quantity[]" type="text" value="' + formatDecimal(item_qty) + '" data-id="' + row_no + '" data-item="' + item_id + '" id="quantity_' + row_no + '" onClick="this.select();"><input name="product_unit[]" type="hidden" class="runit" value="' + product_unit + '"><input name="product_base_quantity[]" type="hidden" class="rbase_quantity" value="' + base_quantity + '"></td>';
             if ((site.settings.product_discount == 1 && allow_discount == 1) || item_discount) {
                 tr_html += '<td class="text-right"><input class="form-control input-sm rdiscount" name="product_discount[]" type="hidden" id="discount_' + row_no + '" value="' + item_ds + '"><span class="text-right sdiscount text-danger" id="sdiscount_' + row_no + '">' + formatMoney(0 - (item_discount * item_qty)) + '</span></td>';
@@ -915,10 +950,22 @@ if (customColumns && customColumns.length > 0) {
             tr_html += '<td class="text-right"><span class="text-right ssubtotal" id="subtotal_' + row_no + '">' + formatMoney(((parseFloat(item_price) + parseFloat(pr_tax_val)) * parseFloat(item_qty))) + '</span></td>';
 
             
-            tr_html += '<td><input type="text" class="form-control input-sm rnotes" name="notes[]" id="notes_' + row_no + '" value="' + (item.notes ? item.notes : '') + '" placeholder="Ghi chú..." style="height: 30px;"></td>';
             tr_html += '<td class="text-center"><i class="fa fa-times tip pointer qudel" id="' + row_no + '" title="Remove" style="cursor:pointer;"></i></td>';
             newTr.html(tr_html);
             newTr.prependTo("#quTable");
+            var totalCols = customColumns ? (customColumns.length + 6) : 6; // Đếm tổng số cột
+if (site.settings.product_discount == 1 && allow_discount == 1) totalCols++;
+if (site.settings.tax1 == 1) totalCols++;
+
+var noteRow = $('<tr class="note-row" data-item-id="' + item_id + '"></tr>');
+var noteHtml = '<td colspan="' + totalCols + '" style="padding: 5px 10px; background-color: #f9f9f9; border-top: none;">' +
+    '<input type="text" class="form-control input-sm rnotes" name="notes[]" ' +
+    'value="' + (item.notes ? item.notes : '') + '" ' +
+    'placeholder="Ghi chú cho sản phẩm này..." ' +
+    'style="border: 1px dashed #ddd;">' +
+    '</td>';
+noteRow.html(noteHtml);
+noteRow.insertAfter(newTr);
             total += formatDecimal(((parseFloat(item_price) + parseFloat(pr_tax_val)) * parseFloat(item_qty)), 4);
             count += parseFloat(item_qty);
             an++;
@@ -953,7 +1000,6 @@ var col = 2; // Cột "Product Name"
 if (customColumns && customColumns.length > 0) {
     col += customColumns.length;
 }
-col += 1;  // ← THÊM DÒNG NÀY (thêm 1 cột cho "Ghi chú")
 
 var tfoot = '<tr id="tfoot" class="tfoot active"><th colspan="' + col + '">Total</th><th class="text-center">' + formatNumber(parseFloat(count) - 1) + '</th>';
         if ((site.settings.product_discount == 1 && allow_discount == 1) || product_discount) {

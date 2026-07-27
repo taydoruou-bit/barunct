@@ -1544,10 +1544,10 @@ function loadItems() {
                 });
             }
         }
+total_discount = parseFloat(order_discount + product_discount);
 
-        total_discount = parseFloat(order_discount + product_discount);
-        // Totals calculations after item addition
-        var gtotal = parseFloat(((total + invoice_tax) - order_discount) + shipping);
+
+var gtotal = parseFloat(((total + invoice_tax) - order_discount) + shipping);
         $('#total').text(formatMoney(total));
         $('#titems').text((an - 1) + ' (' + formatNumber(parseFloat(count) - 1) + ')');
         $('#total_items').val((parseFloat(count) - 1));
@@ -1935,3 +1935,19 @@ function loadItems_Tra() {
         set_page_focus();
     }
 }
+// ✅ SỬA LẠI: Chỉ cập nhật khi người dùng nhập xong (blur)
+$(document).on('blur', '.custom-field', function() {
+    console.log('✅ Custom field changed:', $(this).attr('id'), '=', $(this).val());
+    
+    // Lưu vào localStorage
+    var customFieldsData = {
+        fee_nhamay: $('#custom_fee_nhamay').val() || '0',
+        fee_phukien: $('#custom_fee_phukien').val() || '0',
+        fee_lapdat: $('#custom_fee_lapdat').val() || '0',
+        fee_chanhxe: $('#custom_fee_chanhxe').val() || '0'
+    };
+    localStorage.setItem('custom_fields', JSON.stringify(customFieldsData));
+    
+    // Load lại items để cập nhật tổng
+    loadItems();
+});

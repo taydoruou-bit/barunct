@@ -8,9 +8,7 @@ function apdunggiasi(){
 $(document).ready(function (e) {
     $('body a, body button').attr('tabindex', -1);
     check_add_item_val();
-    if (site.settings.set_focus != 1) {
-        $('#add_item').focus();
-    }
+
     var $customer = $('#slcustomer');
     $customer.change(function (e) {
         localStorage.setItem('slcustomer', $(this).val());
@@ -1554,8 +1552,9 @@ function loadItems() {
         }
 
         total_discount = parseFloat(order_discount + product_discount);
-        // Totals calculations after item addition
-        var gtotal = parseFloat(((total + invoice_tax) - order_discount) + shipping);
+
+
+var gtotal = parseFloat(((total + invoice_tax) - order_discount) + shipping );
         $('#total').text(formatMoney(total));
         $('#titems').text((an - 1) + ' (' + formatNumber(parseFloat(count) - 1) + ')');
         $('#total_items').val((parseFloat(count) - 1));
@@ -1947,5 +1946,38 @@ function loadItems_Tra() {
             $('#slwarehouse').select2("readonly", true);
         }
         set_page_focus();
+    }
+}
+// Lưu custom fields khi thay đổi
+$(document).on('change', '.custom-field', function() {
+    var customFieldsData = {
+        fee_nhamay: $('#custom_fee_nhamay').val() || '0',
+        fee_phukien: $('#custom_fee_phukien').val() || '0',
+        fee_lapdat: $('#custom_fee_lapdat').val() || '0',
+        fee_chanhxe: $('#custom_fee_chanhxe').val() || '0'
+    };
+    localStorage.setItem('custom_fields', JSON.stringify(customFieldsData));
+});
+
+// Chặn focus khi đang edit custom fields
+$(document).on('focus', '.custom-field', function() {
+    $(this).data('is-editing', true);
+});
+
+$(document).on('blur', '.custom-field', function() {
+    var $this = $(this);
+    setTimeout(function() {
+        $this.data('is-editing', false);
+    }, 200);
+});
+
+
+// Thêm vào cuối file, sau dòng loadItems();
+function set_page_focus() {
+    // Chỉ focus khi KHÔNG đang nhập custom fields
+    if (!$('.custom-field:focus').length) {
+        if (site.settings.set_focus != 1) {
+            $('#add_item').focus();
+        }
     }
 }

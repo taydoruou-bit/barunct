@@ -56,22 +56,34 @@ if ($this->input->post('end_date')) {
                 nRow.className = (aData[6] > 0) ? "invoice_link2" : "invoice_link2 warning";
                 return nRow;
             },
-            "aoColumns": [{"mRender": fld}, null,null, null,null, null, {
-                "bSearchable": false,
-                "mRender": pqLhsonFormat
-            }, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": row_status}],
+            "aoColumns": [
+    {"mRender": fld},           // date
+    null,                        // reference_no
+    null,                        // kho
+    null,                        // doitac
+    null,                        // biller
+    null,                        // customer
+    {"bSearchable": false, "mRender": pqLhsonFormat},  // product_qty
+    {"mRender": currencyFormat}, // grand_total
+    {"mRender": currencyFormat}, // paid
+    {"mRender": currencyFormat}, // balance
+    {"mRender": row_status},     // payment_status
+    {"mRender": currencyFormat}  // profit (THÊM DÒNG NÀY)
+],
             "fnFooterCallback": function (nRow, aaData, iStart, iEnd, aiDisplay) {
-                var gtotal = 0, paid = 0, balance = 0;
-                for (var i = 0; i < aaData.length; i++) {
-                    gtotal += parseFloat(aaData[aiDisplay[i]][7]);
-                    paid += parseFloat(aaData[aiDisplay[i]][8]);
-                    balance += parseFloat(aaData[aiDisplay[i]][9]);
-                }
-                var nCells = nRow.getElementsByTagName('th');
-                nCells[7].innerHTML = currencyFormat(parseFloat(gtotal));
-                nCells[8].innerHTML = currencyFormat(parseFloat(paid));
-                nCells[9].innerHTML = currencyFormat(parseFloat(balance));
-            }
+    var gtotal = 0, paid = 0, balance = 0, profit = 0;
+    for (var i = 0; i < aaData.length; i++) {
+        gtotal += parseFloat(aaData[aiDisplay[i]][7]);
+        paid += parseFloat(aaData[aiDisplay[i]][8]);
+        balance += parseFloat(aaData[aiDisplay[i]][9]);
+        profit += parseFloat(aaData[aiDisplay[i]][10]);  // ← PHẢI LÀ [10] KHÔNG PHẢI [11]
+    }
+    var nCells = nRow.getElementsByTagName('th');
+    nCells[7].innerHTML = currencyFormat(parseFloat(gtotal));
+    nCells[8].innerHTML = currencyFormat(parseFloat(paid));
+    nCells[9].innerHTML = currencyFormat(parseFloat(balance));
+    nCells[11].innerHTML = currencyFormat(parseFloat(profit));
+}
         }).fnSetFilteringDelay().dtFilter([
             {column_number: 0, filter_default_label: "[<?=lang('date');?> (yyyy-mm-dd)]", filter_type: "text", data: []},
             {column_number: 1, filter_default_label: "[<?=lang('reference_no');?>]", filter_type: "text", data: []},
@@ -80,6 +92,7 @@ if ($this->input->post('end_date')) {
 			{column_number: 4, filter_default_label: "[<?=lang('biller');?>]", filter_type: "text", data: []},
 			{column_number: 5, filter_default_label: "[<?=lang('customer');?>]", filter_type: "text", data: []},
             {column_number: 10, filter_default_label: "[<?=lang('payment_status');?>]", filter_type: "text", data: []},
+            
         ], "footer");
     });
 </script>
@@ -285,6 +298,7 @@ if ($this->input->post('end_date')) {
                             <th><?= lang("paid"); ?></th>
                             <th><?= lang("balance"); ?></th>
                             <th><?= lang("payment_status"); ?></th>
+                            <th><?= lang("profit"); ?></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -305,6 +319,7 @@ if ($this->input->post('end_date')) {
                             <th><?= lang("paid"); ?></th>
                             <th><?= lang("balance"); ?></th>
                             <th></th>
+                            <th><?= lang("profit"); ?></th>
                         </tr>
                         </tfoot>
                     </table>

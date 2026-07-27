@@ -23,19 +23,21 @@
                 //if(aData[7] > aData[9]){ nRow.className = "product_link warning"; } else { nRow.className = "product_link"; }
                 return nRow;
             },
-            "aoColumns": [{"bSortable": false,"mRender": checkbox}, {"mRender": fld}, null,null,null, null, null, {"mRender": row_status}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": pay_status}, {"bSortable": false,"mRender": attachment}, {"bVisible": false}, {"bSortable": false}],
+            "aoColumns": [{"bSortable": false,"mRender": checkbox}, {"mRender": fld}, null,null,null, null, null, {"mRender": row_status}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": pay_status}, {"bSortable": false,"mRender": attachment}, {"bVisible": false}, {"bSortable": false}],
             "fnFooterCallback": function (nRow, aaData, iStart, iEnd, aiDisplay) {
-                var gtotal = 0, paid = 0, balance = 0;
-                for (var i = 0; i < aaData.length; i++) {
-                    gtotal += parseFloat(aaData[aiDisplay[i]][7]);
-                    paid += parseFloat(aaData[aiDisplay[i]][8]);
-                    balance += parseFloat(aaData[aiDisplay[i]][9]);
-                }
-                var nCells = nRow.getElementsByTagName('th');
-                nCells[7].innerHTML = currencyFormat(parseFloat(gtotal));
-                nCells[8].innerHTML = currencyFormat(parseFloat(paid));
-                nCells[9].innerHTML = currencyFormat(parseFloat(balance));
-            }
+    var gtotal = 0, paid = 0, balance = 0, profit = 0;
+    for (var i = 0; i < aaData.length; i++) {
+        gtotal += parseFloat(aaData[aiDisplay[i]][7]);
+        profit += parseFloat(aaData[aiDisplay[i]][8]);
+        paid += parseFloat(aaData[aiDisplay[i]][9]);
+        balance += parseFloat(aaData[aiDisplay[i]][10]);
+    }
+    var nCells = nRow.getElementsByTagName('th');
+    nCells[7].innerHTML = currencyFormat(parseFloat(gtotal));
+    nCells[8].innerHTML = currencyFormat(parseFloat(profit));
+    nCells[9].innerHTML = currencyFormat(parseFloat(paid));
+    nCells[10].innerHTML = currencyFormat(parseFloat(balance));
+}
         }).fnSetFilteringDelay().dtFilter([
             {column_number: 1, filter_default_label: "[<?=lang('date');?> (yyyy-mm-dd)]", filter_type: "text", data: []},
             {column_number: 2, filter_default_label: "[<?=lang('reference_no');?>]", filter_type: "text", data: []},
@@ -388,7 +390,8 @@
 							<th>Nhân viên</th>
                             <th>Khách hàng</th>
                             <th>TT Đơn hàng</th>
-                            <th><?= lang("grand_total"); ?></th>
+                            <th>Lợi nhuận</th>
+                            <th>Tổng cộng</th>
                             <th>Đã trả</th>
                             <th><?= lang("balance"); ?></th>
                             <th>TT Thanh toán</th>
@@ -408,7 +411,8 @@
                                 <input class="checkbox checkft" type="checkbox" name="check"/>
                             </th>
                             <th></th><th></th><th></th><th></th><th></th><th></th><th></th>
-                            <th><?= lang("grand_total"); ?></th>
+                            <th>Lợi nhuận</th>
+                            <th>Tổng cộng</th>
                             <th><?= lang("paid"); ?></th>
                             <th><?= lang("balance"); ?></th>
                             <th></th>
