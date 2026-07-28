@@ -1,6 +1,8 @@
 DirectoryIndex index.php index.html
 RewriteEngine on
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteRule (^|/)\. - [F,L]
+RewriteRule ^(app|system|db_backups|sessions)(/|$) - [F,L]
 
 <IfModule mod_rewrite.c>
 
@@ -16,6 +18,8 @@ RewriteRule ^(.*)$ index.php?/$1 [L]
 # RewriteRule ^(.*)$ index.php/$1 [NC,L,QSA]
 
 </IfModule> 
-Header add Access-Control-Allow-Origin "*"
-Header add Access-Control-Allow-Headers "origin, x-requested-with, content-type"
-Header add Access-Control-Allow-Methods "PUT, GET, POST, DELETE, OPTIONS"
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "https://barun.eraai.io.vn"
+    Header always set Access-Control-Allow-Headers "origin, x-requested-with, content-type, accept, authorization"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+</IfModule>

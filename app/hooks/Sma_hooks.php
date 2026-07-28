@@ -10,6 +10,25 @@ class Sma_hooks {
             header("Location: install/index.php");
             die();
         }
+
+        $this->security_headers();
+    }
+
+    protected function security_headers() {
+        if (headers_sent()) {
+            return;
+        }
+
+        header('X-Frame-Options: SAMEORIGIN');
+        header('X-Content-Type-Options: nosniff');
+        header('X-XSS-Protection: 1; mode=block');
+        header('Referrer-Policy: same-origin');
+        header('Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()');
+        header("Content-Security-Policy: frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'");
+
+        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        }
     }
 
     public function minify() {
