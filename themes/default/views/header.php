@@ -287,17 +287,6 @@
                             </a>
                         </li>
                     <?php } ?>
-                    <?php if ($Owner || $Admin) { ?>
-                 
-                    <li class="dropdown hidden-xs">
-                        <a class="bred2" title="<?= lang('clear_ls') ?>" data-placement="bottom" id="clearLS" href="#">
-                            <i class="fa fa-eraser"></i>
-							<span class="paddingpadding05"><?= lang('clear_ls') ?></span>
-							
-                        </a>
-                    </li>
-                    <?php } ?>
-
 						<li class="light-blue dropdown-modal">
 							<a data-toggle="dropdown" href="#" class=" dropdown-toggle">
 								<img class="nav-user-photo" src="<?= $this->session->userdata('avatar') ? site_url() . 'assets/uploads/avatars/thumbs/' . $this->session->userdata('avatar') : base_url('assets/images/' . $this->session->userdata('gender') . '.png'); ?>" alt="<?= $this->session->userdata('username'); ?>" />
