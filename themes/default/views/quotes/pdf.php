@@ -457,10 +457,55 @@ div[style*="display: flex"] img.qrimg {
     min-width: 38px !important;
     max-width: 38px !important;
 }
+
+.print-preview-toolbar {
+    align-items: center;
+    background: rgba(255, 255, 255, .96);
+    border: 1px solid #d9eef2;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px rgba(0, 128, 137, .15);
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    left: 50%;
+    padding: 8px 12px;
+    position: sticky;
+    top: 10px;
+    transform: translateX(-50%);
+    width: max-content;
+    z-index: 9999;
+}
+
+.print-preview-toolbar button {
+    background: linear-gradient(135deg, #008c95, #2dd4bf);
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 34px;
+    padding: 0 18px;
+}
+
+.print-preview-toolbar span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+@media print {
+    .print-preview-toolbar {
+        display: none !important;
+    }
+}
     </style>
 </head>
 
 <body>
+<div class="print-preview-toolbar">
+    <button type="button" onclick="window.print();">🖨 In báo giá</button>
+    <span>Bản xem thử</span>
+</div>
 <div id="wrap">
     <div class="row">
         <div class="col-lg-12">
