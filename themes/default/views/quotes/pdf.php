@@ -119,6 +119,7 @@ div[style*="display: flex; align-items: center; justify-content: center"] svg {
     border: 1px solid #000 !important;
     font-size: 11px !important;
     color: #000 !important;
+    width: auto !important;
 }
 
 .table td {
@@ -183,6 +184,16 @@ div[style*="display: flex; align-items: center; justify-content: center"] svg {
     overflow-wrap: break-word !important;
 }
 
+.quote-stt-col {
+    width: 4% !important;
+}
+
+.quote-model-col,
+.quote-color-col,
+.quote-lock-col {
+    width: 11% !important;
+}
+
 .quote-note-col,
 .quote-note-cell {
     text-align: center !important;
@@ -190,6 +201,27 @@ div[style*="display: flex; align-items: center; justify-content: center"] svg {
     width: 11% !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
+}
+
+@media screen {
+    #wrap {
+        width: 1120px !important;
+        max-width: calc(100vw - 48px) !important;
+    }
+
+    .table {
+        table-layout: fixed !important;
+    }
+
+    .table th,
+    .table td {
+        font-size: 10px !important;
+        padding: 6px 3px !important;
+    }
+
+    .product-cell strong {
+        font-size: 10px !important;
+    }
 }
 
 .quote-direction-col,
@@ -658,21 +690,21 @@ div[style*="display: flex"] img.qrimg {
             <table class="table table-bordered">
                 <tbody>
     <tr>
-        <th style="width:40px;"><strong>STT</strong></th>
-        <th style="width:120px;"><strong>Mẫu - Mã</strong></th>
-        <th style="width:120px;"><strong>Màu</strong></th>
-        <th style="width:120px;"><strong>Khóa</strong></th>
+        <th class="quote-stt-col"><strong>STT</strong></th>
+        <th class="quote-model-col"><strong>Mẫu - Mã</strong></th>
+        <th class="quote-color-col"><strong>Màu</strong></th>
+        <th class="quote-lock-col"><strong>Khóa</strong></th>
         <?php
         if (!empty($custom_columns)) {
             foreach ($custom_columns as $col) {
                 $column_class = (strpos($col->column_name, 'Hướng') !== false || strpos($col->column_name, 'huong') !== false) ? ' quote-direction-col' : '';
-                echo '<th class="' . $column_class . '" style="width:100px;"><strong>' . $col->column_name . '</strong></th>';
+                echo '<th class="' . $column_class . '"><strong>' . $col->column_name . '</strong></th>';
             }
         }
         ?>
-        <th class="quote-note-col" style="width:100px;"><strong>Ghi chú</strong></th>
-        <th class="quote-qty-col" style="width:80px;"><strong><?= lang("quantity"); ?></strong></th>
-        <th class="quote-price-col" style="width:100px;"><strong><?= lang("unit_price"); ?></strong></th>
+        <th class="quote-note-col"><strong>Ghi chú</strong></th>
+        <th class="quote-qty-col"><strong><?= lang("quantity"); ?></strong></th>
+        <th class="quote-price-col"><strong><?= lang("unit_price"); ?></strong></th>
         <?php
         if ($Settings->tax1 && $inv->product_tax > 0) {
             echo '<th style="width:100px;"><strong>' . lang("tax") . '</strong></th>';
@@ -681,7 +713,7 @@ div[style*="display: flex"] img.qrimg {
             echo '<th style="width:100px;"><strong>' . lang("discount") . '</strong></th>';
         }
         ?>
-        <th class="quote-total-col" style="width:120px;"><strong><?= lang("subtotal"); ?></strong></th>
+        <th class="quote-total-col"><strong><?= lang("subtotal"); ?></strong></th>
     </tr>
                 <tbody>
                     <?php
