@@ -293,7 +293,7 @@ public function pdf($quote_id = null, $view = null, $save_bufffer = null)
         $html = preg_replace("'\<\?xml(.*)\?\>'", '', $html);
     }
     if ($view) {
-        $this->load->view($this->theme . 'quotes/pdf', $this->data);
+        $this->sma->generate_pdf($html, $name, 'I');
     } elseif ($save_bufffer) {
         return $this->sma->generate_pdf($html, $name, $save_bufffer);
     } else {
