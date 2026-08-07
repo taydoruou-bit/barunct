@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    var quoteProductTaxEnabled = false;
     $('body a, body button').attr('tabindex', -1);
     check_add_item_val();
     if (site.settings.set_focus != 1) {
@@ -294,8 +295,9 @@ $(document).ready(function () {
         }
         var real_unit_price = item.row.real_unit_price;
         var net_price = unit_price;
+        var pr_tax_val = 0;
         $('#prModalLabel').text(item.row.name + ' (' + item.row.code + ')');
-        if (site.settings.tax1) {
+        if (quoteProductTaxEnabled) {
             $('#ptax').select2('val', item.row.tax_rate);
             $('#old_tax').val(item.row.tax_rate);
             var item_discount = 0, ds = discount ? discount : '0';
@@ -310,7 +312,7 @@ $(document).ready(function () {
                 item_discount = parseFloat(ds);
             }
             net_price -= item_discount;
-            var pr_tax = item.row.tax_rate, pr_tax_val = 0;
+            var pr_tax = item.row.tax_rate;
             if (pr_tax !== null && pr_tax != 0) {
                 $.each(tax_rates, function () {
                     if (this.id == pr_tax) {
@@ -389,7 +391,7 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('change', '#pprice, #ptax, #pdiscount', function () {
+    $(document).on('change', '#pprice, #pdiscount', function () {
         var row = $('#' + $('#row_id').val());
         var item_id = row.attr('data-item-id');
         var unit_price = parseFloat($('#pprice').val());
@@ -406,7 +408,7 @@ $(document).ready(function () {
             item_discount = parseFloat(ds);
         }
         unit_price -= item_discount;
-        var pr_tax = $('#ptax').val(), item_tax_method = item.row.tax_method;
+        var pr_tax = quoteProductTaxEnabled ? $('#ptax').val() : 0, item_tax_method = item.row.tax_method;
         var pr_tax_val = 0, pr_tax_rate = 0;
         if (pr_tax !== null && pr_tax != 0) {
             $.each(tax_rates, function () {
@@ -471,7 +473,7 @@ $(document).ready(function () {
     // ✅ TÌM VÀ THAY THẾ TOÀN BỘ HÀM NÀY
 $(document).on('click', '#editItem', function () {
     var row = $('#' + $('#row_id').val());
-    var item_id = row.attr('data-item-id'), new_pr_tax = $('#ptax').val(), new_pr_tax_rate = false;
+    var item_id = row.attr('data-item-id'), new_pr_tax = quoteProductTaxEnabled ? $('#ptax').val() : 0, new_pr_tax_rate = false;
     if (new_pr_tax) {
         $.each(tax_rates, function () {
             if (this.id == new_pr_tax) {
@@ -596,7 +598,7 @@ $(document).on('click', '#editItem', function () {
         var mid = (new Date).getTime(),
             mcode = $('#mcode').val(),
             mname = $('#mname').val(),
-            mtax = parseInt($('#mtax').val()),
+        mtax = quoteProductTaxEnabled ? parseInt($('#mtax').val()) : 0,
             mqty = parseFloat($('#mquantity').val()),
             mdiscount = $('#mdiscount').val() ? $('#mdiscount').val() : '0',
             unit_price = parseFloat($('#mprice').val()),
@@ -646,7 +648,7 @@ $(document).on('click', '#editItem', function () {
         return false;
     });
 
-    $(document).on('change', '#mprice, #mtax, #mdiscount', function () {
+    $(document).on('change', '#mprice, #mdiscount', function () {
         var unit_price = parseFloat($('#mprice').val());
         var ds = $('#mdiscount').val() ? $('#mdiscount').val() : '0';
         if (ds.indexOf("%") !== -1) {
@@ -660,7 +662,7 @@ $(document).on('click', '#editItem', function () {
             item_discount = parseFloat(ds);
         }
         unit_price -= item_discount;
-        var pr_tax = $('#mtax').val(), item_tax_method = 0;
+        var pr_tax = quoteProductTaxEnabled ? $('#mtax').val() : 0, item_tax_method = 0;
         var pr_tax_val = 0, pr_tax_rate = 0;
         if (pr_tax !== null && pr_tax != 0) {
             $.each(tax_rates, function () {
@@ -871,7 +873,7 @@ function loadItems() {
 
             var pr_tax = item.tax_rate;
             var pr_tax_val = 0, pr_tax_rate = 0;
-            if (site.settings.tax1 == 1) {
+            if (quoteProductTaxEnabled) {
                 if (pr_tax !== false) {
                     if (pr_tax.type == 1) {
 
@@ -944,18 +946,14 @@ if (customColumns && customColumns.length > 0) {
             if ((site.settings.product_discount == 1 && allow_discount == 1) || item_discount) {
                 tr_html += '<td class="text-right"><input class="form-control input-sm rdiscount" name="product_discount[]" type="hidden" id="discount_' + row_no + '" value="' + item_ds + '"><span class="text-right sdiscount text-danger" id="sdiscount_' + row_no + '">' + formatMoney(0 - (item_discount * item_qty)) + '</span></td>';
             }
-            if (site.settings.tax1 == 1) {
-                tr_html += '<td class="text-right"><input class="form-control input-sm text-right rproduct_tax" name="product_tax[]" type="hidden" id="product_tax_' + row_no + '" value="' + pr_tax.id + '"><span class="text-right sproduct_tax" id="sproduct_tax_' + row_no + '">' + (pr_tax_rate ? '(' + pr_tax_rate + ')' : '') + ' ' + formatMoney(pr_tax_val * item_qty) + '</span></td>';
-            }
-            tr_html += '<td class="text-right"><span class="text-right ssubtotal" id="subtotal_' + row_no + '">' + formatMoney(((parseFloat(item_price) + parseFloat(pr_tax_val)) * parseFloat(item_qty))) + '</span></td>';
+            tr_html += '<td class="text-right"><input class="rproduct_tax" name="product_tax[]" type="hidden" id="product_tax_' + row_no + '" value="0"><span class="text-right ssubtotal" id="subtotal_' + row_no + '">' + formatMoney((parseFloat(item_price) * parseFloat(item_qty))) + '</span></td>';
 
             
             tr_html += '<td class="text-center"><i class="fa fa-times tip pointer qudel" id="' + row_no + '" title="Remove" style="cursor:pointer;"></i></td>';
             newTr.html(tr_html);
             newTr.prependTo("#quTable");
-            var totalCols = customColumns ? (customColumns.length + 6) : 6; // Đếm tổng số cột
+            var totalCols = customColumns ? (customColumns.length + 5) : 5; // Đếm tổng số cột
 if (site.settings.product_discount == 1 && allow_discount == 1) totalCols++;
-if (site.settings.tax1 == 1) totalCols++;
 
 var noteRow = $('<tr class="note-row" data-item-id="' + item_id + '"></tr>');
 var noteHtml = '<td colspan="' + totalCols + '" style="padding: 5px 10px; background-color: #f9f9f9; border-top: none;">' +
@@ -1005,7 +1003,7 @@ var tfoot = '<tr id="tfoot" class="tfoot active"><th colspan="' + col + '">Total
         if ((site.settings.product_discount == 1 && allow_discount == 1) || product_discount) {
             tfoot += '<th class="text-right">' + formatMoney(product_discount) + '</th>';
         }
-        if (site.settings.tax1 == 1) {
+        if (quoteProductTaxEnabled) {
             tfoot += '<th class="text-right">' + formatMoney(product_tax) + '</th>';
         }
         tfoot += '<th class="text-right">' + formatMoney(total) + '</th><th class="text-center"><i class="fa fa-trash-o" style="opacity:0.5; filter:alpha(opacity=50);"></i></th></tr>';

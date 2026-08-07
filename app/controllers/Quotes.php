@@ -673,9 +673,12 @@ $inv->install_date = $inv->expected_installation_date;  // Ngày lắp đặt d�
             // $this->sma->print_arrays($data, $products);
         }
 
-        if ($this->form_validation->run() == true && $this->quotes_model->addQuote($data, $products)) {
+        if ($this->form_validation->run() == true && ($quote_id = $this->quotes_model->addQuote($data, $products))) {
             $this->session->set_userdata('remove_quls', 1);
             $this->session->set_flashdata('message', $this->lang->line("quote_added"));
+            if ($this->input->post('add_quote_view')) {
+                redirect('quotes/view/' . $quote_id);
+            }
             redirect('quotes');
         } else {
 

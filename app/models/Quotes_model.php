@@ -153,7 +153,7 @@ public function getAllQuoteItems($quote_id)
                 }
             }
         }
-        return true;
+        return $quote_id;
     }
     return false;
 }

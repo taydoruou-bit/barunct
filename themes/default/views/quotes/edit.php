@@ -693,11 +693,6 @@ if ($Settings->product_discount && ($Owner || $Admin || $this->session->userdata
 }
 ?>
 
-                                                    <?php
-                                                    if ($Settings->tax1) {
-                                                        echo '<th class="col-md-2">' . $this->lang->line("product_tax") . '</th>';
-                                                    }
-                                                    ?>
                                                     <th><?= lang("subtotal"); ?> (<span class="currency"><?= $default_currency->code ?></span>)</th>
                                                     <th style="width: 30px !important; text-align: center;"><i class="fa fa-trash-o" style="opacity:0.5; filter:alpha(opacity=50);"></i></th>
                                                 </tr>
@@ -941,20 +936,7 @@ echo form_dropdown('status', $st, 'Đang báo giá', 'class="form-control input-
             <div class="modal-body" id="pr_popover_content">
                 <form class="form-horizontal" role="form">
                     
-                    <?php if ($Settings->tax1) { ?>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label"><?= lang('product_tax') ?></label>
-                            <div class="col-sm-8">
-                                <?php
-                                $tr[""] = "";
-                                foreach ($tax_rates as $tax) {
-                                    $tr[$tax->id] = $tax->name;
-                                }
-                                echo form_dropdown('ptax', $tr, "", 'id="ptax" class="form-control pos-input-tip" style="width:100%;"');
-                                ?>
-                            </div>
-                        </div>
-                    <?php } ?>
+                    <input type="hidden" id="ptax" value="0">
                     <?php if ($Settings->product_serial) { ?>
                         <div class="form-group">
                             <label for="pserial" class="col-sm-4 control-label"><?= lang('serial_no') ?></label>
@@ -1002,10 +984,8 @@ echo form_dropdown('status', $st, 'Đang báo giá', 'class="form-control input-
                     </div>
                     <table class="table table-bordered table-striped">
                         <tr>
-                            <th style="width:25%;"><?= lang('net_unit_price'); ?></th>
-                            <th style="width:25%;"><span id="net_price"></span></th>
-                            <th style="width:25%;"><?= lang('product_tax'); ?></th>
-                            <th style="width:25%;"><span id="pro_tax"></span></th>
+                            <th style="width:50%;"><?= lang('net_unit_price'); ?></th>
+                            <th style="width:50%;"><span id="net_price"></span><span id="pro_tax" style="display:none;"></span></th>
                         </tr>
                     </table>
                     <input type="hidden" id="punit_price" value="" />
@@ -1047,21 +1027,7 @@ echo form_dropdown('status', $st, 'Đang báo giá', 'class="form-control input-
                             <input type="text" class="form-control" id="mname">
                         </div>
                     </div>
-                    <?php if ($Settings->tax1) { ?>
-                        <div class="form-group">
-                            <label for="mtax" class="col-sm-4 control-label"><?= lang('product_tax') ?> *</label>
-
-                            <div class="col-sm-8">
-                                <?php
-                                $tr[""] = "";
-                                foreach ($tax_rates as $tax) {
-                                    $tr[$tax->id] = $tax->name;
-                                }
-                                echo form_dropdown('mtax', $tr, "", 'id="mtax" class="form-control input-tip select" style="width:100%;"');
-                                ?>
-                            </div>
-                        </div>
-                    <?php } ?>
+                    <input type="hidden" id="mtax" value="0">
                     <div class="form-group">
                         <label for="mquantity" class="col-sm-4 control-label"><?= lang('quantity') ?> *</label>
 
@@ -1079,10 +1045,8 @@ echo form_dropdown('status', $st, 'Đang báo giá', 'class="form-control input-
                     </div>
                     <table class="table table-bordered table-striped">
                         <tr>
-                            <th style="width:25%;"><?= lang('net_unit_price'); ?></th>
-                            <th style="width:25%;"><span id="mnet_price"></span></th>
-                            <th style="width:25%;"><?= lang('product_tax'); ?></th>
-                            <th style="width:25%;"><span id="mpro_tax"></span></th>
+                            <th style="width:50%;"><?= lang('net_unit_price'); ?></th>
+                            <th style="width:50%;"><span id="mnet_price"></span><span id="mpro_tax" style="display:none;"></span></th>
                         </tr>
                     </table>
                 </form>
