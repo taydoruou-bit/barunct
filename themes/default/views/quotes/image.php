@@ -146,6 +146,7 @@
 .table {
     width: 100% !important;
     border-collapse: collapse !important;
+    table-layout: fixed !important;
     margin-bottom: 15px !important;
     border: 1px solid #000 !important;
 }
@@ -222,6 +223,34 @@
     .product-cell {
         text-align: center !important;
         vertical-align: middle !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .quote-note-col,
+    .quote-note-cell {
+        text-align: center !important;
+        vertical-align: middle !important;
+        width: 11% !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .quote-direction-col,
+    .quote-direction-cell {
+        width: 9% !important;
+    }
+
+    .quote-qty-col,
+    .quote-qty-cell {
+        width: 7% !important;
+    }
+
+    .quote-price-col,
+    .quote-price-cell,
+    .quote-total-col,
+    .quote-total-cell {
+        width: 10% !important;
     }
 
     .product-cell strong {
@@ -732,12 +761,14 @@ img.qrimg,
                         <?php
                         if (!empty($custom_columns)) {
                             foreach ($custom_columns as $col) {
-                                echo '<th style="width:100px;"><strong>' . $col->column_name . '</strong></th>';
+                                $column_class = (strpos($col->column_name, 'Hướng') !== false || strpos($col->column_name, 'huong') !== false) ? ' quote-direction-col' : '';
+                                echo '<th class="' . $column_class . '" style="width:100px;"><strong>' . $col->column_name . '</strong></th>';
                             }
                         }
                         ?>
-                        <th style="width:80px;"><strong><?= lang("quantity"); ?></strong></th>
-                        <th style="width:100px;"><strong><?= lang("unit_price"); ?></strong></th>
+                        <th class="quote-note-col" style="width:100px;"><strong>Ghi chú</strong></th>
+                        <th class="quote-qty-col" style="width:80px;"><strong><?= lang("quantity"); ?></strong></th>
+                        <th class="quote-price-col" style="width:100px;"><strong><?= lang("unit_price"); ?></strong></th>
                         <?php
                         if ($Settings->tax1 && $inv->product_tax > 0) {
                             echo '<th style="width:100px;"><strong>' . lang("tax") . '</strong></th>';
@@ -746,8 +777,7 @@ img.qrimg,
                             echo '<th style="width:100px;"><strong>' . lang("discount") . '</strong></th>';
                         }
                         ?>
-                        <th style="width:120px;"><strong><?= lang("subtotal"); ?></strong></th>
-                        <th style="width:100px;"><strong>Ghi chú</strong></th>
+                        <th class="quote-total-col" style="width:120px;"><strong><?= lang("subtotal"); ?></strong></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -817,14 +847,18 @@ img.qrimg,
                             foreach ($custom_columns as $col) {
                                 $value = isset($main_row->custom_fields[$col->column_name])
                                     ? $main_row->custom_fields[$col->column_name] : '';
-                                echo '<td class="product-cell"><strong>' . $value . '</strong></td>';
+                                $column_class = (strpos($col->column_name, 'Hướng') !== false || strpos($col->column_name, 'huong') !== false) ? ' quote-direction-cell' : '';
+                                echo '<td class="product-cell' . $column_class . '"><strong>' . $this->sma->decode_html($value) . '</strong></td>';
                             }
                         }
                         ?>
-                        <td class="product-cell">
+                        <td class="product-cell quote-note-cell">
+                            <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
+                        </td>
+                        <td class="product-cell quote-qty-cell">
                             <strong><?= $this->sma->formatQuantity($main_row->unit_quantity); ?></strong>
                         </td>
-                        <td class="product-cell">
+                        <td class="product-cell quote-price-cell">
                             <strong><?php
                             $total_unit_price = $main_row->unit_price;
                             if ($color) {
@@ -851,7 +885,7 @@ img.qrimg,
                                 ?></strong>
                             </td>
                         <?php endif; ?>
-                        <td class="product-cell">
+                        <td class="product-cell quote-total-cell">
                             <strong><?php
                             $total_subtotal = $main_row->subtotal;
                             if ($color) {
@@ -859,9 +893,6 @@ img.qrimg,
                             }
                             echo $this->sma->formatMoney($total_subtotal);
                             ?></strong>
-                        </td>
-                        <td class="product-cell">
-                            <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
                         </td>
                     </tr>
                     <?php
@@ -892,10 +923,11 @@ img.qrimg,
                             <td colspan="<?= $lock_merge_cols; ?>" style="text-align:right !important;">
                                 <strong>Khóa</strong>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-note-cell"></td>
+                            <td class="product-cell quote-qty-cell">
                                 <strong><?= $this->sma->formatQuantity($total_lock_qty); ?></strong>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-price-cell">
                                 <strong><?= $this->sma->formatMoney($total_lock_price / $total_lock_qty); ?></strong>
                             </td>
                             <?php if ($Settings->tax1 && $inv->product_tax > 0): ?>
@@ -904,10 +936,9 @@ img.qrimg,
                             <?php if ($Settings->product_discount && $inv->product_discount != 0): ?>
                                 <td class="product-cell"><strong>-</strong></td>
                             <?php endif; ?>
-                            <td class="product-cell">
+                            <td class="product-cell quote-total-cell">
                                 <strong><?= $this->sma->formatMoney($total_lock_price); ?></strong>
                             </td>
-                            <td class="product-cell"></td>
                         </tr>
                     <?php
                         $r++;
@@ -927,10 +958,13 @@ img.qrimg,
                                 <strong><?= $main_row->product_name; ?></strong>
                                 <?= $main_row->details ? '<br><small><strong>' . $main_row->details . '</strong></small>' : ''; ?>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-note-cell">
+                                <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
+                            </td>
+                            <td class="product-cell quote-qty-cell">
                                 <strong><?= $this->sma->formatQuantity($main_row->unit_quantity); ?></strong>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-price-cell">
                                 <strong><?= $this->sma->formatMoney($main_row->unit_price); ?></strong>
                             </td>
                             <?php if ($Settings->tax1 && $inv->product_tax > 0): ?>
@@ -943,11 +977,8 @@ img.qrimg,
                                     <strong><?= $this->sma->formatMoney($main_row->item_discount); ?></strong>
                                 </td>
                             <?php endif; ?>
-                            <td class="product-cell">
+                            <td class="product-cell quote-total-cell">
                                 <strong><?= $this->sma->formatMoney($main_row->subtotal); ?></strong>
-                            </td>
-                            <td class="product-cell">
-                                <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
                             </td>
                         </tr>
                     <?php
