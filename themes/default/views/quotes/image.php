@@ -1136,14 +1136,34 @@ img.qrimg,
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
 <script>
 window.onload = function() {
-    document.fonts.ready.then(function() {
-        renderQuoteAsImage();
+    Promise.all([waitForFonts(), waitForImages()]).then(function() {
+        setTimeout(renderQuoteAsImage, 300);
     });
 };
 
+function waitForFonts() {
+    return document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+}
+
+function waitForImages() {
+    var images = Array.prototype.slice.call(document.images || []);
+    return Promise.all(images.map(function(img) {
+        if (img.complete && img.naturalWidth !== 0) {
+            return Promise.resolve();
+        }
+        return new Promise(function(resolve) {
+            img.onload = resolve;
+            img.onerror = resolve;
+        });
+    }));
+}
+
 function renderQuoteAsImage() {
-    // Hiển thị thông báo đang xử lý
-    document.body.innerHTML += '<div id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:99999; display:flex; align-items:center; justify-content:center;"><div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:400px;"><div style="font-size:50px; margin-bottom:20px;">📸</div><h2 style="color:#0066cc; margin:0 0 15px 0;">Đang tạo ảnh báo giá</h2><p style="color:#666; margin:0;">Vui lòng chờ trong giây lát...</p><div style="margin-top:20px; width:100%; height:4px; background:#eee; border-radius:2px; overflow:hidden;"><div id="progress" style="width:0%; height:100%; background:#0066cc; transition:width 0.3s;"></div></div></div></div>';
+    var loading = document.createElement('div');
+    loading.id = 'loading';
+    loading.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:99999; display:flex; align-items:center; justify-content:center;';
+    loading.innerHTML = '<div style="background:white; padding:40px; border-radius:15px; text-align:center; max-width:400px;"><div style="font-size:50px; margin-bottom:20px;">📸</div><h2 style="color:#0066cc; margin:0 0 15px 0;">Đang tạo ảnh báo giá</h2><p style="color:#666; margin:0;">Đang lấy đầy đủ nội dung như bản PDF...</p><div style="margin-top:20px; width:100%; height:4px; background:#eee; border-radius:2px; overflow:hidden;"><div id="progress" style="width:0%; height:100%; background:#0066cc; transition:width 0.3s;"></div></div></div>';
+    document.body.appendChild(loading);
     
     var progress = 0;
     var progressBar = setInterval(function() {
@@ -1155,22 +1175,39 @@ function renderQuoteAsImage() {
     setTimeout(function() {
         var element = document.getElementById('wrap');
         
-        // ✅ LẤY KÍCH THƯỚC THỰC TẾ CỦA ELEMENT
-        var actualWidth = element.offsetWidth;
-        var actualHeight = element.scrollHeight;
+        var rect = element.getBoundingClientRect();
+        var actualWidth = Math.ceil(Math.max(element.scrollWidth, element.offsetWidth, rect.width));
+        var actualHeight = Math.ceil(Math.max(element.scrollHeight, element.offsetHeight, rect.height));
+        var maxCanvasPixels = 24000000;
+        var pixelRatio = 2;
+        if ((actualWidth * actualHeight * pixelRatio * pixelRatio) > maxCanvasPixels) {
+            pixelRatio = Math.max(1, Math.sqrt(maxCanvasPixels / (actualWidth * actualHeight)));
+        }
+
+        document.documentElement.style.width = actualWidth + 'px';
+        document.documentElement.style.minHeight = actualHeight + 'px';
+        document.body.style.width = actualWidth + 'px';
+        document.body.style.minHeight = actualHeight + 'px';
+        document.body.style.overflow = 'visible';
         
-        // ✅ SỬ DỤNG html-to-image - XỬ LÝ TỐT HƠN VỚI ROWSPAN/COLSPAN
         htmlToImage.toJpeg(element, {
             quality: 0.95,
-            pixelRatio: 3,
+            pixelRatio: pixelRatio,
             backgroundColor: '#ffffff',
             cacheBust: true,
             width: actualWidth,
             height: actualHeight,
+            canvasWidth: Math.ceil(actualWidth * pixelRatio),
+            canvasHeight: Math.ceil(actualHeight * pixelRatio),
+            windowWidth: actualWidth,
+            windowHeight: actualHeight,
             style: {
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif',
                 margin: '0',
-                padding: '0'
+                padding: '0',
+                width: actualWidth + 'px',
+                height: actualHeight + 'px',
+                overflow: 'visible'
             }
         })
         .then(function(dataUrl) {

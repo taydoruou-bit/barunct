@@ -59,6 +59,7 @@ class Quotes extends MY_Controller
         $edit_link = anchor('quotes/edit/$1', '<i class="fa fa-edit"></i> ' . lang('edit_quote'));
         $convert_link = anchor('sales/add/$1', '<i class="fa fa-heart"></i> ' . lang('create_sale'));
         $pc_link = anchor('purchases/add/$1', '<i class="fa fa-star"></i> ' . lang('create_purchase'));
+        $image_link = anchor('quotes/image/$1', '<i class="fa fa-file-image-o"></i> Tải ảnh', 'target="_blank"');
         $pdf_link = anchor('quotes/pdf/$1', '<i class="fa fa-file-pdf-o"></i> ' . lang('download_pdf'));
         $delete_link = "<a href='#' class='po' title='<b>" . $this->lang->line("delete_quote") . "</b>' data-content=\"<p>"
             . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . site_url('quotes/delete/$1') . "'>"
@@ -73,6 +74,7 @@ class Quotes extends MY_Controller
                         <li>' . $convert_link . '</li>
 			
                         <li>' . $pc_link . '</li>
+                        <li>' . $image_link . '</li>
                         <li>' . $pdf_link . '</li>
                         <li>' . $email_link . '</li>
                         <li>' . $delete_link . '</li>

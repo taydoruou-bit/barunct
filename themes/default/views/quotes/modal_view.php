@@ -670,6 +670,12 @@
                                 </a>
                             </div>
                             <div class="btn-group">
+                                <a href="<?= site_url('quotes/image/' . $inv->id) ?>" target="_blank" class="tip btn btn-success" title="Tải ảnh báo giá">
+                                    <i class="fa fa-file-image-o"></i>
+                                    <span class="hidden-sm hidden-xs">Tải ảnh</span>
+                                </a>
+                            </div>
+                            <div class="btn-group">
                                 <a href="<?= site_url('quotes/pdf/' . $inv->id) ?>" class="tip btn btn-primary" title="<?= lang('download_pdf') ?>">
                                     <i class="fa fa-download"></i>
                                     <span class="hidden-sm hidden-xs"><?= lang('pdf') ?></span>
