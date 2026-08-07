@@ -12,15 +12,15 @@
     print-color-adjust: exact !important;
 }
 
-html, body { 
-    height: auto !important; 
-    background: #FFF !important; 
+html, body {
+    height: auto !important;
+    background: #FFF !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
-body:before, body:after { 
-    display: none !important; 
+body:before, body:after {
+    display: none !important;
 }
 
 /* ========== CONTAINER CHÍNH ========== */
@@ -106,27 +106,28 @@ div[style*="display: flex; align-items: center; justify-content: center"] svg {
 .table {
     width: 100% !important;
     border-collapse: collapse !important;
+    table-layout: fixed !important;
     margin-bottom: 15px !important;
     border: 2px solid #000 !important;
 }
 
-.table th { 
-    text-align: center !important; 
-    padding: 10px 8px !important; 
+.table th {
+    text-align: center !important;
+    padding: 7px 4px !important;
     font-weight: bold !important;
     background-color: #B4C6E7 !important;
     border: 1px solid #000 !important;
-    font-size: 14px !important;
+    font-size: 11px !important;
     color: #000 !important;
 }
 
-.table td { 
-    padding: 10px 8px !important; 
+.table td {
+    padding: 7px 4px !important;
     text-align: center !important;
     vertical-align: middle !important;
     border: 1px solid #000 !important;
     font-weight: bold !important;
-    font-size: 14px !important;
+    font-size: 11px !important;
     color: #000 !important;
 }
 
@@ -135,9 +136,9 @@ div[style*="display: flex; align-items: center; justify-content: center"] svg {
     color: #000 !important;
 }
 
-.table tfoot td { 
-    font-size: 14px !important;
-    padding: 10px 8px !important;
+.table tfoot td {
+    font-size: 11px !important;
+    padding: 7px 4px !important;
     border: 1px solid #000 !important;
     color: #000 !important;
 }
@@ -178,6 +179,34 @@ div[style*="display: flex; align-items: center; justify-content: center"] svg {
 .product-cell {
     text-align: center !important;
     vertical-align: middle !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.quote-note-col,
+.quote-note-cell {
+    text-align: center !important;
+    vertical-align: middle !important;
+    width: 11% !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.quote-direction-col,
+.quote-direction-cell {
+    width: 9% !important;
+}
+
+.quote-qty-col,
+.quote-qty-cell {
+    width: 7% !important;
+}
+
+.quote-price-col,
+.quote-price-cell,
+.quote-total-col,
+.quote-total-cell {
+    width: 10% !important;
 }
 
 .product-cell strong {
@@ -527,7 +556,7 @@ div[style*="display: flex"] img.qrimg {
                 </tr>
             </table>
             <?php } ?>
-            
+
             <h1>BẢNG BÁO GIÁ KIÊM XÁC NHẬN ĐẶT HÀNG</h1>
 
             <div class="well well-sm">
@@ -571,16 +600,16 @@ div[style*="display: flex"] img.qrimg {
                         if (!empty($customer->address) && $customer->address != '-') {
                             $address_parts[] = $customer->address;
                         }
-                        
+
                         $city_state = trim($customer->city . ' ' . $customer->postal_code . ' ' . $customer->state);
                         if (!empty($city_state) && $city_state != '-') {
                             $address_parts[] = $city_state;
                         }
-                        
+
                         if (!empty($customer->country) && $customer->country != '-') {
                             $address_parts[] = $customer->country;
                         }
-                        
+
                         echo implode(', ', $address_parts);
                     ?>
                     <br>
@@ -592,7 +621,7 @@ div[style*="display: flex"] img.qrimg {
 <?php endif; ?>
                     <br>
 <?php if (!empty($inv->construction_address)): ?>
-    <strong>Địa chỉ công trình:</strong> 
+    <strong>Địa chỉ công trình:</strong>
     <?= str_replace(['<p>', '</p>'], '', $this->sma->decode_html($inv->construction_address)); ?>
 <?php endif; ?>
                     <?php
@@ -618,7 +647,7 @@ div[style*="display: flex"] img.qrimg {
                     if ($customer->cf6 != "-" && $customer->cf6 != "") {
                         $custom_info[] = lang("ccf6") . ": " . $customer->cf6;
                     }
-                    
+
                     if (!empty($custom_info)) {
                         echo "<br>" . implode(" | ", $custom_info);
                     }
@@ -636,13 +665,14 @@ div[style*="display: flex"] img.qrimg {
         <?php
         if (!empty($custom_columns)) {
             foreach ($custom_columns as $col) {
-                echo '<th style="width:100px;"><strong>' . $col->column_name . '</strong></th>';
+                $column_class = (strpos($col->column_name, 'Hướng') !== false || strpos($col->column_name, 'huong') !== false) ? ' quote-direction-col' : '';
+                echo '<th class="' . $column_class . '" style="width:100px;"><strong>' . $col->column_name . '</strong></th>';
             }
         }
         ?>
-        <th style="width:100px;"><strong>Ghi chú</strong></th>
-        <th style="width:80px;"><strong><?= lang("quantity"); ?></strong></th>
-        <th style="width:100px;"><strong><?= lang("unit_price"); ?></strong></th>
+        <th class="quote-note-col" style="width:100px;"><strong>Ghi chú</strong></th>
+        <th class="quote-qty-col" style="width:80px;"><strong><?= lang("quantity"); ?></strong></th>
+        <th class="quote-price-col" style="width:100px;"><strong><?= lang("unit_price"); ?></strong></th>
         <?php
         if ($Settings->tax1 && $inv->product_tax > 0) {
             echo '<th style="width:100px;"><strong>' . lang("tax") . '</strong></th>';
@@ -651,7 +681,7 @@ div[style*="display: flex"] img.qrimg {
             echo '<th style="width:100px;"><strong>' . lang("discount") . '</strong></th>';
         }
         ?>
-        <th style="width:120px;"><strong><?= lang("subtotal"); ?></strong></th>
+        <th class="quote-total-col" style="width:120px;"><strong><?= lang("subtotal"); ?></strong></th>
     </tr>
                 <tbody>
                     <?php
@@ -720,17 +750,18 @@ if (!empty($custom_columns)) {
     foreach ($custom_columns as $col) {
         $value = isset($main_row->custom_fields[$col->column_name])
             ? $main_row->custom_fields[$col->column_name] : '';
-        echo '<td class="product-cell"><strong>' . $this->sma->decode_html($value) . '</strong></td>';
+        $column_class = (strpos($col->column_name, 'Hướng') !== false || strpos($col->column_name, 'huong') !== false) ? ' quote-direction-cell' : '';
+        echo '<td class="product-cell' . $column_class . '"><strong>' . $this->sma->decode_html($value) . '</strong></td>';
     }
 }
 ?>
-                        <td class="product-cell">
+                        <td class="product-cell quote-note-cell">
                             <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
                         </td>
-                        <td class="product-cell">
+                        <td class="product-cell quote-qty-cell">
                             <strong><?= $this->sma->formatQuantity($main_row->unit_quantity); ?></strong>
                         </td>
-                        <td class="product-cell">
+                        <td class="product-cell quote-price-cell">
                             <strong><?php
                             $total_unit_price = $main_row->unit_price;
                             if ($color) {
@@ -759,7 +790,7 @@ if (!empty($custom_columns)) {
                                 ?></strong>
                             </td>
                         <?php endif; ?>
-                        <td class="product-cell">
+                        <td class="product-cell quote-total-cell">
                             <strong><?php
                             $total_subtotal = $main_row->subtotal;
                             if ($color) {
@@ -797,11 +828,11 @@ if (!empty($custom_columns)) {
                             <td colspan="<?= $lock_merge_cols; ?>" style="text-align:right;">
                                 <strong>Khóa</strong>
                             </td>
-                            <td class="product-cell"></td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-note-cell"></td>
+                            <td class="product-cell quote-qty-cell">
                                 <strong><?= $this->sma->formatQuantity($total_lock_qty); ?></strong>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-price-cell">
                                 <strong><?= $this->sma->formatMoney($total_lock_price / $total_lock_qty); ?></strong>
                             </td>
                             <?php if ($Settings->tax1 && $inv->product_tax > 0): ?>
@@ -814,7 +845,7 @@ if (!empty($custom_columns)) {
                                     <strong>-</strong>
                                 </td>
                             <?php endif; ?>
-                            <td class="product-cell">
+                            <td class="product-cell quote-total-cell">
                                 <strong><?= $this->sma->formatMoney($total_lock_price); ?></strong>
                             </td>
                         </tr>
@@ -836,13 +867,13 @@ if (!empty($custom_columns)) {
                                 <strong><?= $main_row->product_name; ?></strong>
                                 <?= $main_row->details ? '<br><small><strong>' . $main_row->details . '</strong></small>' : ''; ?>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-note-cell">
                                 <strong><?= !empty($main_row->notes) ? $this->sma->decode_html($main_row->notes) : ''; ?></strong>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-qty-cell">
                                 <strong><?= $this->sma->formatQuantity($main_row->unit_quantity); ?></strong>
                             </td>
-                            <td class="product-cell">
+                            <td class="product-cell quote-price-cell">
                                 <strong><?= $this->sma->formatMoney($main_row->unit_price); ?></strong>
                             </td>
                             <?php if ($Settings->tax1 && $inv->product_tax > 0): ?>
@@ -855,7 +886,7 @@ if (!empty($custom_columns)) {
                                     <strong><?= $this->sma->formatMoney($main_row->item_discount); ?></strong>
                                 </td>
                             <?php endif; ?>
-                            <td class="product-cell">
+                            <td class="product-cell quote-total-cell">
                                 <strong><?= $this->sma->formatMoney($main_row->subtotal); ?></strong>
                             </td>
                         </tr>
@@ -913,20 +944,20 @@ if (!empty($custom_columns)) {
                     ?>
                     <tr>
                         <td colspan="<?= $tcol; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
-                            <?= lang("total_amount"); ?> 
+                            <?= lang("total_amount"); ?>
                         </td>
                         <td style="text-align:center; font-weight:bold; color: #dc143c;  background-color: #B4C6E7 !important;"><?= $this->sma->formatMoney($inv->grand_total); ?></td>
                     </tr>
                     <?php if ($inv->deposit_amount && $inv->deposit_amount > 0) { ?>
 <tr>
     <td colspan="<?= $tcol; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
-        Tiền đặt cọc 
+        Tiền đặt cọc
     </td>
     <td style="text-align:center; font-weight:bold; color: #dc143c;  background-color: #B4C6E7 !important;"><?= $this->sma->formatMoney($inv->deposit_amount); ?></td>
 </tr>
 <tr>
     <td colspan="<?= $tcol; ?>" style="text-align:right; font-weight:bold; color: #0066cc; background-color: #B4C6E7 !important;">
-        Còn lại 
+        Còn lại
     </td>
     <td style="text-align:center; font-weight:bold; color: #dc143c;  background-color: #B4C6E7 !important;">
         <?= $this->sma->formatMoney($inv->grand_total - $inv->deposit_amount); ?>
@@ -937,7 +968,7 @@ if (!empty($custom_columns)) {
                 </tfoot>
             </table>
 
-            
+
 
             <div class="footer-section" style="border-top: 2px solid #ddd; margin-top: 5px !important;">
     <p style="font-weight: bold !important;">
